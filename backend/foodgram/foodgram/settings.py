@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'djoser',
+    'recipes',
 ]
 
 MIDDLEWARE = [
@@ -128,7 +129,7 @@ AUTH_USER_MODEL = 'users.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
+        'rest_framework.permissions.IsAuthenticated',
     ],
 
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -151,6 +152,7 @@ DJOSER = {
         'user': ('rest_framework.permissions.AllowAny',),
         'user_list': ('rest_framework.permissions.AllowAny',),
         'set_username': ('rest_framework.permissions.IsAdminUser',),
+        'user_delete': ('rest_framework.permissions.IsAdminUser',),
         'password_reset': ('rest_framework.permissions.IsAdminUser',),
         'password_reset_confirm': ('rest_framework.permissions.IsAdminUser',),
         'username_reset': ('rest_framework.permissions.IsAdminUser',),
