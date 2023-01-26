@@ -31,12 +31,12 @@ class CustomUserSerializer(UserSerializer):
         )
 
     def get_is_subscribed(self, obj):
-        if self.context['request'].user.is_anonymous:
-            return False
-        return Follow.objects.filter(
-            user=self.context['request'].user,
-            author=obj.id
-        ).exists()
+        return (
+                self.context['request'].user.is_authenticated
+                and Follow.objects.filter(author=obj,
+                                          user=self.context['request'].user
+                                          ).exists()
+        )
 
 
 class FollowSerializer(CustomUserSerializer):

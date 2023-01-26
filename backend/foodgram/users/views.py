@@ -12,7 +12,6 @@ from .serializers import FollowSerializer
 class CustomUserViewSet(UserViewSet):
     queryset = User.objects.all()
     http_method_names = ('get', 'post', 'delete')
-    permission_classes = (AllowAny,)
 
     @action(
         detail=False,

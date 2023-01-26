@@ -76,7 +76,7 @@ class Recipes(models.Model):
     )
     ingredients = models.ManyToManyField(
         Ingredients,
-        through='IngredientsInRecipe',
+        through='IngredientRecipe',
         verbose_name='Ингредиент'
     )
     cooking_time = models.PositiveSmallIntegerField(
@@ -99,7 +99,7 @@ class Recipes(models.Model):
         return self.name
 
 
-class IngredientsInRecipe(models.Model):
+class IngredientRecipe(models.Model):
     recipes = models.ForeignKey(
         Recipes,
         on_delete=models.CASCADE

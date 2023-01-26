@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from .models import Ingredients, Tag, Recipes, IngredientsInRecipe
+from .models import Ingredients, Tag, Recipes, IngredientRecipe
 
 
 @admin.register(Ingredients)
@@ -14,10 +14,11 @@ class IngredientsAdmin(admin.ModelAdmin):
 class TagAdmin(admin.ModelAdmin):
     list_display = ('name', 'color', 'slug')
     search_fields = ('name',)
+    prepopulated_fields = {"slug": ("name",)}
 
 
 class IngredientInRecipeInline(admin.TabularInline):
-    model = IngredientsInRecipe
+    model = IngredientRecipe
 
 
 @admin.register(Recipes)
@@ -40,6 +41,6 @@ class Recipes(admin.ModelAdmin):
     image_preview.short_description = 'Фото рецепта'
 
 
-@admin.register(IngredientsInRecipe)
+@admin.register(IngredientRecipe)
 class IngredientsInRecipeAdmin(admin.ModelAdmin):
     list_display = ('recipes', 'ingredient', 'amount')
