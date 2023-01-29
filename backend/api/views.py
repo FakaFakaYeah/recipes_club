@@ -6,10 +6,11 @@ from rest_framework.filters import SearchFilter
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from recipes.models import Ingredient, Tag, Recipe
+from recipes.models import Ingredient, Tag, Recipe, Favourites
 from users.models import User, Follow
 from .serializers import TagSerializer, IngredientSerializer, \
-    RecipeReadSerializer, RecipeCreateSerializer, FollowSerializer
+    RecipeReadSerializer, RecipeCreateSerializer, FollowSerializer, \
+    RecipeMiniSerializer
 from .permissions import IsAuthorOrReadOnly
 
 
@@ -81,3 +82,26 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return RecipeReadSerializer
         return RecipeCreateSerializer
 
+    @action(
+        detail=True, methods=['post', 'delete'],
+        permission_classes=(IsAuthenticated,)
+    )
+    def favorite(self, request, pk=None):
+        user = request.user
+        recipe = get_object_or_404(Recipe, id=pk)
+        favorite = Favourites.objects.filter(user=user, recipe=recipe)
+        if request.method == 'POST':
+            if favorite.exists():
+                return Response({'error': 'Рецепт уже добавлен в избранное!'},
+                                status=status.HTTP_400_BAD_REQUEST)
+            Favourites.objects.create(user=user, recipe=recipe)
+            serializer = RecipeMiniSerializer(
+                recipe, context={'request': request}
+            )
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        elif request.method == 'DELETE':
+            if not favorite.exists():
+                return Response({'error': 'Этого рецепта нет в избранном!'},
+                                status=status.HTTP_400_BAD_REQUEST)
+            favorite.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)

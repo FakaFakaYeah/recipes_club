@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from .models import Ingredient, Tag, Recipe, RecipeIngredient
+from .models import Ingredient, Tag, Recipe, RecipeIngredient, Favourites
 
 
 @admin.register(Ingredient)
@@ -44,3 +44,8 @@ class Recipes(admin.ModelAdmin):
 @admin.register(RecipeIngredient)
 class IngredientsInRecipeAdmin(admin.ModelAdmin):
     list_display = ('recipe', 'ingredient', 'amount')
+
+
+@admin.register(Favourites)
+class FavouritesAdmin(admin.ModelAdmin):
+    list_display = ('__str__', 'pub_date')

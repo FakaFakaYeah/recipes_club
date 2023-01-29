@@ -134,3 +134,34 @@ class RecipeIngredient(models.Model):
 
     def __str__(self):
         return f'{self.ingredient} --> {self.recipe}'
+
+
+class Favourites(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='favourites',
+        verbose_name='Кто добавляет в избранное'
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='favourites',
+        verbose_name='Рецепт'
+    )
+    pub_date = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Время добавления'
+    )
+
+    class Meta:
+        ordering = ('-pub_date',)
+        verbose_name_plural = 'Любимые рецепты'
+        constraints = [
+            UniqueConstraint(
+                fields=['user', 'recipe'], name='unique_favourites'
+            )
+        ]
+
+    def __str__(self):
+        return f'{self.user} --- > {self.recipe}'

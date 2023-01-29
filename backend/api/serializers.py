@@ -3,7 +3,9 @@ from djoser.serializers import UserSerializer, UserCreateSerializer
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 
-from recipes.models import Tag, Ingredient, Recipe, RecipeIngredient
+from recipes.models import (
+    Tag, Ingredient, Recipe, RecipeIngredient, Favourites
+)
 from users.models import Follow, User
 
 
@@ -83,12 +85,22 @@ class RecipeReadSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True)
     author = CustomUserSerializer(read_only=True)
     image = Base64ImageField()
+    is_favorited = serializers.SerializerMethodField()
 
     class Meta:
         model = Recipe
         fields = (
-            'id', 'tags', 'author', 'ingredients', 'name', 'image', 'text',
-            'cooking_time'
+            'id', 'tags', 'author', 'ingredients', 'is_favorited', 'name',
+            'image', 'text', 'cooking_time'
+        )
+
+    def get_is_favorited(self, obj):
+        return (
+                self.context['request'].user.is_authenticated
+                and Favourites.objects.filter(
+                  recipe=obj,
+                  user=self.context['request'].user
+                    ).exists()
         )
 
 
