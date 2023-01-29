@@ -13,11 +13,13 @@ from .serializers import (
     TagSerializer, IngredientSerializer, RecipeReadSerializer,
     RecipeCreateSerializer, FollowSerializer, RecipeMiniSerializer
 )
+from .pagination import CustomPagination
 
 
 class CustomUserViewSet(UserViewSet):
     queryset = User.objects.all()
     http_method_names = ('get', 'post', 'delete')
+    pagination_class = CustomPagination
 
     @action(
         detail=False,
@@ -60,7 +62,6 @@ class CustomUserViewSet(UserViewSet):
 class IngredientsViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    pagination_class = None
     permission_classes = (AllowAny,)
     filter_backends = (SearchFilter,)
     search_fields = ('^name',)
@@ -69,7 +70,6 @@ class IngredientsViewSet(viewsets.ReadOnlyModelViewSet):
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
-    pagination_class = None
     permission_classes = (AllowAny,)
 
 
@@ -77,6 +77,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     http_method_names = ('get', 'post', 'patch', 'delete')
     permission_classes = (IsAuthorOrReadOnly,)
+    pagination_class = CustomPagination
 
     def get_serializer_class(self):
         if self.request.method == 'GET':

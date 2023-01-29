@@ -9,13 +9,15 @@ from recipes.models import Ingredient
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        print("Import Ingredients data")
+        print("Начинаем импорт Ингредиентов")
 
         path = os.path.join(settings.BASE_DIR, "../data", "ingredients.json")
         print(path)
         ingredients = json.load(open(path, 'r', encoding="utf8"))
 
-        for ingredient in ingredients:
-            Ingredient.objects.create(**ingredient)
+        Ingredient.objects.bulk_create(
+            [Ingredient(**ingredient)
+             for ingredient in ingredients]
+        )
 
-        print("Import Ingredients data done")
+        print("Импорт ингредиентов успешно завершен.")

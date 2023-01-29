@@ -137,32 +137,30 @@ class RecipeCreateSerializer(RecipeReadSerializer):
             )
         return data
 
+    def add_tags_and_ingredients(self, recipe, tags, ingredients):
+        recipe.tags.set(tags)
+        RecipeIngredient.objects.bulk_create(
+            [RecipeIngredient(recipe=recipe,
+                              ingredient=get_object_or_404(
+                                  Ingredient, pk=ingredient['id']),
+                              amount=ingredient['amount'])
+             for ingredient in ingredients]
+        )
+
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
         recipe = Recipe.objects.create(
             author=self.context['request'].user, **validated_data
         )
-        for ingredient in ingredients:
-            RecipeIngredient.objects.create(
-                recipe=recipe,
-                ingredient=get_object_or_404(Ingredient, pk=ingredient['id']),
-                amount=ingredient['amount']
-            )
-        recipe.tags.set(tags)
+        self.add_tags_and_ingredients(recipe, tags, ingredients)
         return recipe
 
     def update(self, instance, validated_data):
         ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
         RecipeIngredient.objects.filter(recipe=instance).delete()
-        for ingredient in ingredients:
-            RecipeIngredient.objects.create(
-                recipe=instance,
-                ingredient=get_object_or_404(Ingredient, pk=ingredient['id']),
-                amount=ingredient['amount']
-            )
-        instance.tags.set(tags)
+        self.add_tags_and_ingredients(instance, tags, ingredients)
         return super().update(instance, validated_data)
 
     def to_representation(self, instance):
@@ -182,7 +180,7 @@ class RecipeMiniSerializer(RecipeReadSerializer):
 
 class FollowSerializer(CustomUserSerializer):
 
-    recipes = RecipeMiniSerializer(many=True, read_only=True)
+    recipes = serializers.SerializerMethodField()
     recipes_count = serializers.IntegerField(source='recipes.count')
 
     class Meta:
@@ -191,3 +189,11 @@ class FollowSerializer(CustomUserSerializer):
             'email', 'id', 'username', 'first_name', 'last_name',
             'is_subscribed', 'recipes', 'recipes_count'
         )
+
+    def get_recipes(self, obj):
+        request = self.context.get('request')
+        recipes_limit = request.GET.get('recipes_limit')
+        queryset = Recipe.objects.filter(author=obj)
+        if recipes_limit:
+            queryset = queryset[:int(recipes_limit)]
+        return RecipeMiniSerializer(queryset, many=True).data
