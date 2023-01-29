@@ -1,10 +1,10 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from .models import Ingredients, Tag, Recipes, IngredientRecipe
+from .models import Ingredient, Tag, Recipe, RecipeIngredient
 
 
-@admin.register(Ingredients)
+@admin.register(Ingredient)
 class IngredientsAdmin(admin.ModelAdmin):
     list_display = ('name', 'measurement_unit')
     search_fields = ('name',)
@@ -18,10 +18,10 @@ class TagAdmin(admin.ModelAdmin):
 
 
 class IngredientInRecipeInline(admin.TabularInline):
-    model = IngredientRecipe
+    model = RecipeIngredient
 
 
-@admin.register(Recipes)
+@admin.register(Recipe)
 class Recipes(admin.ModelAdmin):
     inlines = [
         IngredientInRecipeInline,
@@ -41,6 +41,6 @@ class Recipes(admin.ModelAdmin):
     image_preview.short_description = 'Фото рецепта'
 
 
-@admin.register(IngredientRecipe)
+@admin.register(RecipeIngredient)
 class IngredientsInRecipeAdmin(admin.ModelAdmin):
-    list_display = ('recipes', 'ingredient', 'amount')
+    list_display = ('recipe', 'ingredient', 'amount')

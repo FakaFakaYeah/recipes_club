@@ -1,12 +1,16 @@
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
-from rest_framework import status
+from rest_framework import viewsets, status
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.filters import SearchFilter
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from .models import User, Follow
-from .serializers import FollowSerializer
+from recipes.models import Ingredient, Tag, Recipe
+from users.models import User, Follow
+from .serializers import TagSerializer, IngredientSerializer, \
+    RecipeReadSerializer, RecipeCreateSerializer, FollowSerializer
+from .permissions import IsAuthorOrReadOnly
 
 
 class CustomUserViewSet(UserViewSet):
@@ -49,3 +53,31 @@ class CustomUserViewSet(UserViewSet):
                                 status=status.HTTP_400_BAD_REQUEST)
             subscription.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class IngredientsViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Ingredient.objects.all()
+    serializer_class = IngredientSerializer
+    pagination_class = None
+    permission_classes = (AllowAny,)
+    filter_backends = (SearchFilter,)
+    search_fields = ('^name',)
+
+
+class TagViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
+    pagination_class = None
+    permission_classes = (AllowAny,)
+
+
+class RecipeViewSet(viewsets.ModelViewSet):
+    queryset = Recipe.objects.all()
+    http_method_names = ('get', 'post', 'patch', 'delete')
+    permission_classes = (IsAuthorOrReadOnly,)
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return RecipeReadSerializer
+        return RecipeCreateSerializer
+

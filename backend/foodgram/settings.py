@@ -154,12 +154,12 @@ DJOSER = {
     'LOGIN_FIELD': 'email',
     'HIDE_USERS': False,
     'SERIALIZERS': {
-        'current_user': 'users.serializers.CustomUserSerializer',
-        'user_create': 'users.serializers.CustomCreateUserSerializer',
-        'user': 'users.serializers.CustomUserSerializer',
+        'current_user': 'api.serializers.CustomUserSerializer',
+        'user_create': 'api.serializers.CustomCreateUserSerializer',
+        'user': 'api.serializers.CustomUserSerializer',
     },
     'PERMISSIONS': {
-        'user': ('rest_framework.permissions.IsAuthenticated',),
+        'user': ('rest_framework.permissions.AllowAny',),
         'user_list': ('rest_framework.permissions.AllowAny',),
         'set_username': ('rest_framework.permissions.IsAdminUser',),
         'user_delete': ('rest_framework.permissions.IsAdminUser',),
