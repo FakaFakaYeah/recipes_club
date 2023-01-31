@@ -25,7 +25,7 @@ SECRET_KEY = 'c5@-d*^ch+tn^8wi9ts^9&mjt!u4@0!=bs*x70#&%m*2hho)ye'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django_filters',
     'colorfield',
     'api',
+    'django_cleanup',
 ]
 
 MIDDLEWARE = [
@@ -156,7 +157,7 @@ DJOSER = {
         'user': 'api.serializers.CustomUserSerializer',
     },
     'PERMISSIONS': {
-        'user': ('rest_framework.permissions.AllowAny',),
+        'user': ('rest_framework.permissions.IsAuthenticated',),
         'user_list': ('rest_framework.permissions.AllowAny',),
         'set_username': ('rest_framework.permissions.IsAdminUser',),
         'user_delete': ('rest_framework.permissions.IsAdminUser',),

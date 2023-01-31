@@ -115,9 +115,9 @@ class RecipeReadSerializer(serializers.ModelSerializer):
 
 
 class RecipeCreateSerializer(RecipeReadSerializer):
-    ingredients = RecipeIngredientCreateSerializer(many=True)
+    ingredients = RecipeIngredientCreateSerializer(many=True, allow_empty=True)
     tags = serializers.PrimaryKeyRelatedField(
-        queryset=Tag.objects.all(), many=True
+        queryset=Tag.objects.all(), many=True, allow_empty=True
     )
 
     class Meta:
@@ -125,17 +125,6 @@ class RecipeCreateSerializer(RecipeReadSerializer):
         fields = (
             'ingredients', 'tags', 'image', 'name', 'text', 'cooking_time'
         )
-
-    def validate(self, data):
-        if not self.initial_data['ingredients']:
-            raise serializers.ValidationError(
-                'Укажите хотя бы один ингредиент!'
-            )
-        elif not self.initial_data['tags']:
-            raise serializers.ValidationError(
-                'Укажите хотя бы один Тэг!'
-            )
-        return data
 
     def add_tags_and_ingredients(self, recipe, tags, ingredients):
         recipe.tags.set(tags)
@@ -193,7 +182,7 @@ class FollowSerializer(CustomUserSerializer):
     def get_recipes(self, obj):
         request = self.context.get('request')
         recipes_limit = request.GET.get('recipes_limit')
-        queryset = Recipe.objects.filter(author=obj)
+        queryset = obj.recipes.all()
         if recipes_limit:
             queryset = queryset[:int(recipes_limit)]
         return RecipeMiniSerializer(queryset, many=True).data

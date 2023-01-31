@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
@@ -14,6 +15,7 @@ from .serializers import (
     RecipeCreateSerializer, FollowSerializer, RecipeMiniSerializer
 )
 from .pagination import CustomPagination
+from .filters import RecipeFilter
 
 
 class CustomUserViewSet(UserViewSet):
@@ -37,9 +39,9 @@ class CustomUserViewSet(UserViewSet):
         detail=True, methods=['post', 'delete'],
         permission_classes=(IsAuthenticated,)
     )
-    def subscribe(self, request, pk=None):
+    def subscribe(self, request, id=None):
         user = request.user
-        author = get_object_or_404(User, pk=pk)
+        author = get_object_or_404(User, pk=id)
         subscription = Follow.objects.filter(user=user, author=author)
         if request.method == 'POST':
             if user == author:
@@ -78,6 +80,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
     http_method_names = ('get', 'post', 'patch', 'delete')
     permission_classes = (IsAuthorOrReadOnly,)
     pagination_class = CustomPagination
+    filter_backends = (DjangoFilterBackend,)
+    filter_class = RecipeFilter
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
