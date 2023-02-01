@@ -10,7 +10,7 @@ from users.models import Follow, User
 
 
 class CustomCreateUserSerializer(UserCreateSerializer):
-
+    """Сериализатор для создания пользователя"""
     class Meta:
         model = User
         fields = (
@@ -26,6 +26,8 @@ class CustomCreateUserSerializer(UserCreateSerializer):
 
 
 class CustomUserSerializer(UserSerializer):
+    """Сериализатор для получения пользователя"""
+
     is_subscribed = serializers.SerializerMethodField()
 
     class Meta:
@@ -45,6 +47,7 @@ class CustomUserSerializer(UserSerializer):
 
 
 class IngredientSerializer(serializers.ModelSerializer):
+    """Сериализатор ингредиентов """
 
     class Meta:
         model = Ingredient
@@ -52,6 +55,7 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class TagSerializer(serializers.ModelSerializer):
+    """Сериализатор тэгов"""
 
     class Meta:
         model = Tag
@@ -59,6 +63,8 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
+    """Сериализатор для получения списка ингредиентов"""
+
     id = serializers.ReadOnlyField(source='ingredient.id')
     name = serializers.ReadOnlyField(source='ingredient.name')
     measurement_unit = serializers.ReadOnlyField(
@@ -71,6 +77,8 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
 
 
 class RecipeIngredientCreateSerializer(serializers.ModelSerializer):
+    """Сериализатор для создания списка ингредиентов"""
+
     id = serializers.IntegerField()
 
     class Meta:
@@ -79,6 +87,8 @@ class RecipeIngredientCreateSerializer(serializers.ModelSerializer):
 
 
 class RecipeReadSerializer(serializers.ModelSerializer):
+    """Сериализатор для получения рецепта"""
+
     ingredients = RecipeIngredientSerializer(
         many=True, source='recipeingredient_set'
     )
@@ -115,6 +125,8 @@ class RecipeReadSerializer(serializers.ModelSerializer):
 
 
 class RecipeCreateSerializer(RecipeReadSerializer):
+    """Сериализатор для создания рецепта"""
+
     ingredients = RecipeIngredientCreateSerializer(many=True, allow_empty=True)
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(), many=True, allow_empty=True
@@ -161,6 +173,7 @@ class RecipeCreateSerializer(RecipeReadSerializer):
 
 
 class RecipeMiniSerializer(RecipeReadSerializer):
+    """Сериализатор для получения рецепта в упрощенной форме"""
 
     class Meta:
         model = Recipe
@@ -168,6 +181,7 @@ class RecipeMiniSerializer(RecipeReadSerializer):
 
 
 class FollowSerializer(CustomUserSerializer):
+    """Сериализатор для подписок/отписок"""
 
     recipes = serializers.SerializerMethodField()
     recipes_count = serializers.IntegerField(source='recipes.count')
