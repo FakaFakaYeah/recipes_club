@@ -3,6 +3,7 @@ from djoser.serializers import UserSerializer, UserCreateSerializer
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 
+
 from recipes.models import (
     Tag, Ingredient, Recipe, RecipeIngredient, Favourites, ShoppingCart
 )
@@ -10,6 +11,7 @@ from users.models import Follow, User
 
 
 class CustomCreateUserSerializer(UserCreateSerializer):
+
     """Сериализатор для создания пользователя"""
     class Meta:
         model = User
@@ -172,7 +174,7 @@ class RecipeCreateSerializer(RecipeReadSerializer):
         return serializer.data
 
 
-class RecipeMiniSerializer(RecipeReadSerializer):
+class RecipeMiniSerializer(serializers.ModelSerializer):
     """Сериализатор для получения рецепта в упрощенной форме"""
 
     class Meta:
