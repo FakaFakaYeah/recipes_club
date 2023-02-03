@@ -42,24 +42,15 @@ class CustomUserViewSet(UserViewSet):
         permission_classes=(IsAuthenticated,)
     )
     def subscribe(self, request, id=None):
-        user = request.user
         author = get_object_or_404(User, pk=id)
-        subscription = Follow.objects.filter(user=user, author=author)
         if request.method == 'POST':
-            if user == author:
+            if request.user == author:
                 return Response({'error': 'Нельзя подписываться на себя!'},
                                 status=status.HTTP_400_BAD_REQUEST)
-            elif subscription.exists():
-                return Response({'error': 'Вы уже подписаны на пользователя!'},
-                                status=status.HTTP_400_BAD_REQUEST)
-            Follow.objects.create(user=user, author=author)
-            serializer = FollowSerializer(author, context={'request': request})
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        elif not subscription.exists():
-            return Response({'error': 'Вы не подписаны на пользователя!'},
-                            status=status.HTTP_400_BAD_REQUEST)
-        subscription.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+            return universal_post(author, request.user, Follow,
+                                  FollowSerializer, {'request': request},
+                                  'author')
+        return universal_delete(author, request.user, Follow, 'author')
 
 
 class IngredientsViewSet(viewsets.ReadOnlyModelViewSet):
@@ -99,7 +90,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def favorite(self, request, pk=None):
         if request.method == 'POST':
             return universal_post(self.__get_recipe(pk), request.user,
-                                  Favourites, RecipeMiniSerializer)
+                                  Favourites, RecipeMiniSerializer,
+                                  context={'request': request})
         return universal_delete(self.__get_recipe(pk), request.user,
                                 Favourites)
 
@@ -110,7 +102,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def shopping_cart(self, request, pk=None):
         if request.method == 'POST':
             return universal_post(self.__get_recipe(pk), request.user,
-                                  ShoppingCart, RecipeMiniSerializer)
+                                  ShoppingCart, RecipeMiniSerializer,
+                                  context={'request': request})
         return universal_delete(self.__get_recipe(pk), request.user,
                                 ShoppingCart)
 

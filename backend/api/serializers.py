@@ -3,7 +3,6 @@ from djoser.serializers import UserSerializer, UserCreateSerializer
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 
-
 from recipes.models import (
     Tag, Ingredient, Recipe, RecipeIngredient, Favourites, ShoppingCart
 )
@@ -150,6 +149,15 @@ class RecipeCreateSerializer(RecipeReadSerializer):
              for ingredient in ingredients]
         )
 
+    def validate(self, data):
+        ingredients = data.get('ingredients')
+        ingredient_id = [ingredient.get('id') for ingredient in ingredients]
+        if len(ingredient_id) != len(set(ingredient_id)):
+            raise serializers.ValidationError(
+                'Ингредиент можно добавить только один раз!'
+            )
+        return data
+
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
@@ -196,8 +204,7 @@ class FollowSerializer(CustomUserSerializer):
         )
 
     def get_recipes(self, obj):
-        request = self.context.get('request')
-        recipes_limit = request.GET.get('recipes_limit')
+        recipes_limit = self.context.get('request').GET.get('recipes_limit')
         queryset = obj.recipes.all()
         if recipes_limit:
             queryset = queryset[:int(recipes_limit)]

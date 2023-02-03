@@ -26,19 +26,21 @@ def shopping_cart_style(ingredients):
                         filename='Список покупок.pdf')
 
 
-def universal_post(obj, user, model, obj_serialiezer):
-    if model.objects.filter(user=user, recipe=obj).exists():
+def universal_post(
+    obj, user, model, obj_serialiezer, context, filter_field='recipe'
+):
+    if model.objects.filter(user=user, **{filter_field: obj}).exists():
         raise ValidationError(
             f'{user.first_name}, вы уже добавили'
             f'"{obj}" в {model._meta.verbose_name_plural}!'
         )
-    model.objects.create(user=user, recipe=obj)
-    serializer = obj_serialiezer(obj)
+    serializer = obj_serialiezer(obj, context=context)
+    model.objects.create(user=user, **{filter_field: obj})
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-def universal_delete(obj, user, model):
-    queryset = model.objects.filter(user=user, recipe=obj)
+def universal_delete(obj, user, model, filter_field='recipe'):
+    queryset = model.objects.filter(user=user, **{filter_field: obj})
     if not queryset.exists():
         raise ValidationError(
             f'{user.first_name}, вы не добавляли'
