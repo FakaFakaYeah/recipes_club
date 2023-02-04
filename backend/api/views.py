@@ -1,5 +1,6 @@
 import io
 
+from django.conf import settings
 from django.db.models import Sum
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
@@ -11,7 +12,6 @@ from reportlab.pdfgen.canvas import Canvas
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from django.conf import settings
 
 from recipes.models import (
     Ingredient, Tag, Recipe, Favourites, ShoppingCart, RecipeIngredient
@@ -28,9 +28,14 @@ from .utils import universal_post, universal_delete, page_template
 
 
 class CustomUserViewSet(UserViewSet):
+    """Вьюсет для работы с аутификацией и подписками"""
     queryset = User.objects.all()
     http_method_names = ('get', 'post', 'delete')
     pagination_class = CustomPagination
+
+    @staticmethod
+    def __get_author(pk):
+        return get_object_or_404(User, pk=pk)
 
     @action(
         detail=False,
@@ -49,15 +54,15 @@ class CustomUserViewSet(UserViewSet):
         permission_classes=(IsAuthenticated,)
     )
     def subscribe(self, request, id=None):
-        author = get_object_or_404(User, pk=id)
+        obj_dict = {'user': request.user, 'author': self.__get_author(id)}
         if request.method == 'POST':
-            return universal_post(author, request.user, Follow,
-                                  FollowSerializer, {'request': request},
-                                  'author')
-        return universal_delete(author, request.user, Follow, 'author')
+            return universal_post(obj_dict, Follow, obj_dict['author'],
+                                  FollowSerializer, {'request': request})
+        return universal_delete(obj_dict, Follow, obj_dict['author'])
 
 
 class IngredientsViewSet(viewsets.ReadOnlyModelViewSet):
+    """Вьюсет ингредиентов"""
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     permission_classes = (AllowAny,)
@@ -66,12 +71,15 @@ class IngredientsViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
+    """Вьюсет тэгов"""
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = (AllowAny,)
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
+    """Вьюсет для работы с рецептами, добавлением
+     их в избранное и список покупок + скачивание списка"""
     queryset = Recipe.objects.all()
     http_method_names = ('get', 'post', 'patch', 'delete')
     permission_classes = (IsAuthorOrReadOnly,)
@@ -79,7 +87,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     filter_class = RecipeFilter
 
-    def __get_recipe(self, pk):
+    @staticmethod
+    def __get_recipe(pk):
         return get_object_or_404(Recipe, pk=pk)
 
     def get_serializer_class(self):
@@ -92,24 +101,22 @@ class RecipeViewSet(viewsets.ModelViewSet):
         permission_classes=(IsAuthenticated,)
     )
     def favorite(self, request, pk=None):
+        obj_dict = {'user': request.user, 'recipe': self.__get_recipe(pk)}
         if request.method == 'POST':
-            return universal_post(self.__get_recipe(pk), request.user,
-                                  Favourites, RecipeMiniSerializer,
-                                  context={'request': request})
-        return universal_delete(self.__get_recipe(pk), request.user,
-                                Favourites)
+            return universal_post(obj_dict, Favourites, obj_dict['recipe'],
+                                  RecipeMiniSerializer, {'request': request})
+        return universal_delete(obj_dict, Favourites, obj_dict['recipe'])
 
     @action(
         detail=True, methods=['post', 'delete'],
         permission_classes=(IsAuthenticated,)
     )
     def shopping_cart(self, request, pk=None):
+        obj_dict = {'user': request.user, 'recipe': self.__get_recipe(pk)}
         if request.method == 'POST':
-            return universal_post(self.__get_recipe(pk), request.user,
-                                  ShoppingCart, RecipeMiniSerializer,
-                                  context={'request': request})
-        return universal_delete(self.__get_recipe(pk), request.user,
-                                ShoppingCart)
+            return universal_post(obj_dict, ShoppingCart, obj_dict['recipe'],
+                                  RecipeMiniSerializer, {'request': request})
+        return universal_delete(obj_dict, ShoppingCart, obj_dict['recipe'])
 
     @action(detail=False, permission_classes=(IsAuthenticated,))
     def download_shopping_cart(self, request):
@@ -131,11 +138,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
             c.drawCentredString(
                 500, y, f"{ingredient['ingredient__measurement_unit']}"
             )
+            y -= 25
             if ingredient_number % settings.ING_IN_PAGE == settings.ING_INDEX:
                 c.showPage()
                 page_template(c)
                 y = 700
-            y -= 25
             ingredient_number += 1
         c.save()
         buffer.seek(0)

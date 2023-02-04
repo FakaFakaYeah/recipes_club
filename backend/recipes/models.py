@@ -8,6 +8,7 @@ from users.models import User
 
 
 class Ingredient(models.Model):
+    """Модель ингредиентов"""
     name = models.CharField(
         max_length=200,
         verbose_name='Название'
@@ -25,6 +26,7 @@ class Ingredient(models.Model):
 
 
 class Tag(models.Model):
+    """Модель тэгов"""
     name = models.CharField(
         max_length=200,
         unique=True,
@@ -49,6 +51,7 @@ class Tag(models.Model):
 
 
 class Recipe(models.Model):
+    """Модель рецептов"""
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -103,6 +106,8 @@ class Recipe(models.Model):
 
 
 class RecipeIngredient(models.Model):
+    """Вспомогательная модель рецептов и
+    ингредиентов, с подсчетом количества"""
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE
@@ -133,6 +138,8 @@ class RecipeIngredient(models.Model):
 
 
 class BaseFavouritesAndShoppingCart(models.Model):
+    """Абстрактная модель для рецептов из
+    избранного и списка покупок"""
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -164,12 +171,14 @@ class BaseFavouritesAndShoppingCart(models.Model):
 
 
 class Favourites(BaseFavouritesAndShoppingCart):
+    """Модель избранных рецептов"""
 
     class Meta(BaseFavouritesAndShoppingCart.Meta):
         verbose_name_plural = 'Любимые рецепты'
 
 
 class ShoppingCart(BaseFavouritesAndShoppingCart):
+    """Модель рецептов из списка покупок"""
 
     class Meta(BaseFavouritesAndShoppingCart.Meta):
         verbose_name_plural = 'Рецепты в списке покупок'

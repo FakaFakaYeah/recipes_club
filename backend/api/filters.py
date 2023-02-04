@@ -5,7 +5,7 @@ from recipes.models import Recipe, Tag
 
 
 class RecipeFilter(FilterSet):
-    """Фильтр для рецептов. Поиск тэгу,
+    """Фильтр для рецептов. Поиск slug тэга,
     любимым рецептам и рецептам в списке покупок."""
 
     tags = filters.ModelMultipleChoiceFilter(

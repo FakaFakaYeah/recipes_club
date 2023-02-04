@@ -43,16 +43,11 @@ class Recipes(admin.ModelAdmin):
     image_preview.short_description = 'Фото рецепта'
 
 
-@admin.register(RecipeIngredient)
-class IngredientsInRecipeAdmin(admin.ModelAdmin):
-    list_display = ('recipe', 'ingredient', 'amount')
-
-
 @admin.register(Favourites)
 class FavouritesAdmin(admin.ModelAdmin):
     list_display = ('__str__', 'pub_date')
 
 
 @admin.register(ShoppingCart)
-class FavouritesAdmin(admin.ModelAdmin):
+class ShoppingAdmin(admin.ModelAdmin):
     list_display = ('__str__', 'pub_date')

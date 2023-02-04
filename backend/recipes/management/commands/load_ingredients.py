@@ -8,6 +8,7 @@ from recipes.models import Ingredient
 
 
 class Command(BaseCommand):
+    """Команда по загрузке ингредиентов"""
     def handle(self, *args, **options):
         print("Начинаем импорт Ингредиентов")
 

@@ -7,6 +7,7 @@ from .validators import validate_username
 
 
 class User(AbstractUser):
+    """Собственная модель пользователей"""
     email = models.EmailField(
         max_length=254,
         unique=True
@@ -38,6 +39,7 @@ class User(AbstractUser):
 
 
 class Follow(models.Model):
+    """Модель подписок на пользователя"""
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

@@ -10,7 +10,6 @@ from users.models import Follow, User
 
 
 class CustomCreateUserSerializer(UserCreateSerializer):
-
     """Сериализатор для создания пользователя"""
     class Meta:
         model = User
@@ -18,17 +17,9 @@ class CustomCreateUserSerializer(UserCreateSerializer):
             'email', 'id', 'username', 'first_name', 'last_name', 'password'
         )
 
-    def validate_username(self, value):
-        if User.objects.filter(username__iexact=value).exists():
-            raise serializers.ValidationError(
-                'Такой пользователь уже существует'
-            )
-        return value
-
 
 class CustomUserSerializer(UserSerializer):
     """Сериализатор для получения пользователя"""
-
     is_subscribed = serializers.SerializerMethodField()
 
     class Meta:
@@ -49,7 +40,6 @@ class CustomUserSerializer(UserSerializer):
 
 class IngredientSerializer(serializers.ModelSerializer):
     """Сериализатор ингредиентов """
-
     class Meta:
         model = Ingredient
         fields = '__all__'
@@ -57,7 +47,6 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 class TagSerializer(serializers.ModelSerializer):
     """Сериализатор тэгов"""
-
     class Meta:
         model = Tag
         fields = '__all__'
@@ -65,7 +54,6 @@ class TagSerializer(serializers.ModelSerializer):
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
     """Сериализатор для получения списка ингредиентов"""
-
     id = serializers.ReadOnlyField(source='ingredient.id')
     name = serializers.ReadOnlyField(source='ingredient.name')
     measurement_unit = serializers.ReadOnlyField(
@@ -79,7 +67,6 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
 
 class RecipeIngredientCreateSerializer(serializers.ModelSerializer):
     """Сериализатор для создания списка ингредиентов"""
-
     id = serializers.IntegerField()
 
     class Meta:
@@ -89,7 +76,6 @@ class RecipeIngredientCreateSerializer(serializers.ModelSerializer):
 
 class RecipeReadSerializer(serializers.ModelSerializer):
     """Сериализатор для получения рецепта"""
-
     ingredients = RecipeIngredientSerializer(
         many=True, source='recipeingredient_set'
     )
@@ -127,7 +113,6 @@ class RecipeReadSerializer(serializers.ModelSerializer):
 
 class RecipeCreateSerializer(RecipeReadSerializer):
     """Сериализатор для создания рецепта"""
-
     ingredients = RecipeIngredientCreateSerializer(many=True,
                                                    allow_empty=False)
     tags = serializers.PrimaryKeyRelatedField(
@@ -140,7 +125,8 @@ class RecipeCreateSerializer(RecipeReadSerializer):
             'ingredients', 'tags', 'image', 'name', 'text', 'cooking_time'
         )
 
-    def add_tags_and_ingredients(self, recipe, tags, ingredients):
+    @staticmethod
+    def add_tags_and_ingredients(recipe, tags, ingredients):
         recipe.tags.set(tags)
         RecipeIngredient.objects.bulk_create(
             [RecipeIngredient(recipe=recipe,
@@ -185,7 +171,6 @@ class RecipeCreateSerializer(RecipeReadSerializer):
 
 class RecipeMiniSerializer(serializers.ModelSerializer):
     """Сериализатор для получения рецепта в упрощенной форме"""
-
     class Meta:
         model = Recipe
         fields = ('id', 'name', 'image', 'cooking_time')
@@ -193,7 +178,6 @@ class RecipeMiniSerializer(serializers.ModelSerializer):
 
 class FollowSerializer(CustomUserSerializer):
     """Сериализатор для подписок/отписок"""
-
     recipes = serializers.SerializerMethodField()
     recipes_count = serializers.IntegerField(source='recipes.count')
 
