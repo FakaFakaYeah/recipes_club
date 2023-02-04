@@ -19,7 +19,7 @@ class CustomCreateUserSerializer(UserCreateSerializer):
 
 
 class CustomUserSerializer(UserSerializer):
-    """Сериализатор для получения пользователя"""
+    """Сериализатор для получения пользователей"""
     is_subscribed = serializers.SerializerMethodField()
 
     class Meta:
@@ -75,7 +75,7 @@ class RecipeIngredientCreateSerializer(serializers.ModelSerializer):
 
 
 class RecipeReadSerializer(serializers.ModelSerializer):
-    """Сериализатор для получения рецепта"""
+    """Сериализатор для создания/редактирования/удаления рецептов"""
     ingredients = RecipeIngredientSerializer(
         many=True, source='recipeingredient_set'
     )
@@ -112,7 +112,7 @@ class RecipeReadSerializer(serializers.ModelSerializer):
 
 
 class RecipeCreateSerializer(RecipeReadSerializer):
-    """Сериализатор для создания рецепта"""
+    """Сериализатор для работы с рецептами"""
     ingredients = RecipeIngredientCreateSerializer(many=True,
                                                    allow_empty=False)
     tags = serializers.PrimaryKeyRelatedField(
