@@ -1,14 +1,21 @@
+import io
+
 from django.db.models import Sum
+from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
-from rest_framework import viewsets, status
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfgen.canvas import Canvas
+from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.response import Response
+from django.conf import settings
 
-from recipes.models import Ingredient, Tag, Recipe, Favourites, ShoppingCart, \
-    RecipeIngredient
+from recipes.models import (
+    Ingredient, Tag, Recipe, Favourites, ShoppingCart, RecipeIngredient
+)
 from users.models import User, Follow
 from .filters import RecipeFilter, IngredientsFilter
 from .pagination import CustomPagination
@@ -17,7 +24,7 @@ from .serializers import (
     TagSerializer, IngredientSerializer, RecipeReadSerializer,
     RecipeCreateSerializer, FollowSerializer, RecipeMiniSerializer
 )
-from .utils import shopping_cart_style, universal_post, universal_delete
+from .utils import universal_post, universal_delete, page_template
 
 
 class CustomUserViewSet(UserViewSet):
@@ -44,9 +51,6 @@ class CustomUserViewSet(UserViewSet):
     def subscribe(self, request, id=None):
         author = get_object_or_404(User, pk=id)
         if request.method == 'POST':
-            if request.user == author:
-                return Response({'error': 'Нельзя подписываться на себя!'},
-                                status=status.HTTP_400_BAD_REQUEST)
             return universal_post(author, request.user, Follow,
                                   FollowSerializer, {'request': request},
                                   'author')
@@ -113,4 +117,27 @@ class RecipeViewSet(viewsets.ModelViewSet):
             recipe__shoppingcart__user=request.user).values(
             'ingredient__name', 'ingredient__measurement_unit').annotate(
             amount=Sum('amount'))
-        return shopping_cart_style(ingredients)
+        buffer = io.BytesIO()
+        c = Canvas(buffer)
+        pdfmetrics.registerFont(
+            TTFont('Bad_Comic', 'Bad_Comic.ttf', 'UTF-8'))
+        page_template(c)
+        y = 700
+        ingredient_number = 1
+        for ingredient in ingredients:
+            c.drawCentredString(35, y, str(ingredient_number))
+            c.drawCentredString(200, y, f"{ingredient['ingredient__name']}")
+            c.drawCentredString(380, y, f"{ingredient['amount']}")
+            c.drawCentredString(
+                500, y, f"{ingredient['ingredient__measurement_unit']}"
+            )
+            if ingredient_number % settings.ING_IN_PAGE == settings.ING_INDEX:
+                c.showPage()
+                page_template(c)
+                y = 700
+            y -= 25
+            ingredient_number += 1
+        c.save()
+        buffer.seek(0)
+        return FileResponse(buffer, as_attachment=True,
+                            filename='Список покупок.pdf')

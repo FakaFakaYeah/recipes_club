@@ -1,13 +1,10 @@
 from colorfield.fields import ColorField
+from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.db.models import UniqueConstraint
 
 from users.models import User
-
-MIN_COOK_TIME = 1
-MAX_COOK_TIME = 10080
-MIN_AMOUNT = 1
 
 
 class Ingredient(models.Model):
@@ -82,11 +79,11 @@ class Recipe(models.Model):
     cooking_time = models.PositiveSmallIntegerField(
         validators=[
             MinValueValidator(
-                MIN_COOK_TIME,
+                settings.MIN_COOK_TIME,
                 message='Нельзя готовить меньше одной минуты!'
             ),
             MaxValueValidator(
-                MAX_COOK_TIME,
+                settings.MAX_COOK_TIME,
                 message='Нельзя готовить блюдо неделю!'
             )
         ],
@@ -117,7 +114,7 @@ class RecipeIngredient(models.Model):
     amount = models.PositiveSmallIntegerField(
         validators=[
             MinValueValidator(
-                MIN_AMOUNT,
+                settings.MIN_AMOUNT,
                 message='Неправильная величина продукта!'
             )
         ]
@@ -176,6 +173,3 @@ class ShoppingCart(BaseFavouritesAndShoppingCart):
 
     class Meta(BaseFavouritesAndShoppingCart.Meta):
         verbose_name_plural = 'Рецепты в списке покупок'
-
-
-

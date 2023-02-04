@@ -9,26 +9,28 @@ from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
 
-def shopping_cart_style(ingredients):
-    buffer = io.BytesIO()
-    c = Canvas(buffer)
-    pdfmetrics.registerFont(
-        TTFont('Bad_Comic', 'Bad_Comic.ttf', 'UTF-8'))
+def page_template(c):
+    """Шаблон страницы листа PDF, если
+    список покупок будет очень большой"""
+
     c.setFont('Bad_Comic', size=25)
     c.drawCentredString(297, 800, 'Список покупок!')
-    for ingredient in ingredients:
-        c.drawString(50, 500, f"{ingredient['ingredient__name']}")
-        c.drawString(50, 500, f"{ingredient['amount']}")
-        c.drawString(50, 500, f"{ingredient['ingredient__measurement_unit']}")
-    c.save()
-    buffer.seek(0)
-    return FileResponse(buffer, as_attachment=True,
-                        filename='Список покупок.pdf')
+    c.drawCentredString(297, 20, 'Удачных покупок!')
+    c.line(0, 730, 600, 730)
+    c.line(0, 50, 600, 50)
+    c.setFont('Bad_Comic', size=12)
+    c.drawCentredString(510, 825, 'Prod by foodgram')
+    c.drawString(30, 750, '№')
+    c.drawString(160, 750, 'Ингредиент')
+    c.drawString(350, 750, 'Количество')
+    c.drawString(480, 750, 'Ед.Изм')
 
 
 def universal_post(
     obj, user, model, obj_serialiezer, context, filter_field='recipe'
 ):
+    if user == obj:
+        raise ValidationError('Нельзя подписываться на себя!')
     if model.objects.filter(user=user, **{filter_field: obj}).exists():
         raise ValidationError(
             f'{user.first_name}, вы уже добавили'

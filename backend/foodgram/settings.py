@@ -78,6 +78,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'foodgram.wsgi.application'
 
+AUTH_USER_MODEL = 'users.User'
+
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
@@ -132,8 +134,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-AUTH_USER_MODEL = 'users.User'
-
+# Настройки rest_framework
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
@@ -144,6 +145,8 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ],
 }
+
+# Настройки Djoser
 
 DJOSER = {
     'LOGIN_FIELD': 'email',
@@ -164,3 +167,11 @@ DJOSER = {
         'username_reset_confirm': ('rest_framework.permissions.IsAdminUser',),
     }
 }
+
+# Константы, которые используются в проекте
+
+MIN_COOK_TIME = 1  # Минимальное время приготовления блюда
+MAX_COOK_TIME = 10080  # Максимальное время приготовления блюда
+MIN_AMOUNT = 1  # Минимальное количество ингредиента
+ING_IN_PAGE = 6  # Количество ингредиентов на одной странице в списке покупок
+ING_INDEX = 0  # Значение, которое создает новую страницу со списком покупок

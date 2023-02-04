@@ -128,9 +128,10 @@ class RecipeReadSerializer(serializers.ModelSerializer):
 class RecipeCreateSerializer(RecipeReadSerializer):
     """Сериализатор для создания рецепта"""
 
-    ingredients = RecipeIngredientCreateSerializer(many=True, allow_empty=True)
+    ingredients = RecipeIngredientCreateSerializer(many=True,
+                                                   allow_empty=False)
     tags = serializers.PrimaryKeyRelatedField(
-        queryset=Tag.objects.all(), many=True, allow_empty=True
+        queryset=Tag.objects.all(), many=True, allow_empty=False
     )
 
     class Meta:
