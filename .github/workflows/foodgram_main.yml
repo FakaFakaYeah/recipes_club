@@ -56,11 +56,11 @@ jobs:
         push: true
         tags: ${{ secrets.DOCKER_USERNAME }}/foodgram:latest
     - name: Push to Docker Hub frontend
-        uses: docker/build-push-action@v2
-        with:
-          context: frontend/
-          push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/foodgram_frontend:latest
+      uses: docker/build-push-action@v2
+      with:
+        context: frontend/
+        push: true
+        tags: ${{ secrets.DOCKER_USERNAME }}/foodgram_frontend:latest
     - name: send_message if build and push failed
       if: ${{ failure() }}
       uses: appleboy/telegram-action@master
