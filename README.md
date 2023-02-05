@@ -2,7 +2,7 @@
 
 ![](https://github.com/FakaFakaYeah/foodgram-project-react/actions/workflows/foodgram_main.yml/badge.svg)
 
-![img.png](/backend/static/img.png)
+![img.png](/data/img.png)
 
 ### Описание проекта:
 Сайт предназначен для публикации свои любимых рецептов, подписок на интересных
