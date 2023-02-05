@@ -1,1 +1,151 @@
+name: Project Foodgram
+on: [push]
+jobs:
 
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+    - name: Install dependencies and test with flake8
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 pep8-naming flake8-broken-line flake8-return
+        pip install -r backend/requirements.txt
+        python -m flake8
+    - name: send_message if tests failed
+      if: ${{ failure() }}
+      uses: appleboy/telegram-action@master
+      with:
+        to: ${{ secrets.TELEGRAM_TO }}
+        token: ${{ secrets.TELEGRAM_TOKEN }}
+        message: |
+          Ошибка при прохождении тестов!
+          https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    - name: send message on Discord if telegram failed
+      if: ${{ failure() }}
+      uses: sarisia/actions-status-discord@v1
+      with:
+        webhook: ${{ secrets.DISCORD_WEBHOOK }}
+        description: |
+          Не удалось отправить сообщение о результате workflow в Телеграм.
+          https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+  build_and_push_to_docker_hub:
+    name: Push Docker image to Docker Hub
+    runs-on: ubuntu-latest
+    needs: tests
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+    steps:
+    - name: Check out the repo
+      uses: actions/checkout@v2
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+    - name: Login to Docker
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+    - name: Push to Docker Hub backend
+      uses: docker/build-push-action@v2
+      with:
+        context: backend/
+        push: true
+        tags: ${{ secrets.DOCKER_USERNAME }}/foodgram:latest
+    - name: Push to Docker Hub frontend
+        uses: docker/build-push-action@v2
+        with:
+          context: frontend/
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/foodgram_frontend:latest
+    - name: send_message if build and push failed
+      if: ${{ failure() }}
+      uses: appleboy/telegram-action@master
+      with:
+        to: ${{ secrets.TELEGRAM_TO }}
+        token: ${{ secrets.TELEGRAM_TOKEN }}
+        message: |
+          Ошибка при сборке/отправке образа на DockerHub  - ${{ github.repository }}
+          https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    - name: send message on Discord if telegram failed
+      if: ${{ failure() }}
+      uses: sarisia/actions-status-discord@v1
+      with:
+        webhook: ${{ secrets.DISCORD_WEBHOOK }}
+        description: |
+          Не удалось отправить сообщение о результате workflow в Телеграм.
+          https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build_and_push_to_docker_hub
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+    steps:
+    - name: executing remote ssh commands to deploy
+      uses: appleboy/ssh-action@master
+      with:
+       host: ${{ secrets.HOST }}
+       username: ${{ secrets.USER }}
+       key: ${{ secrets.SSH_KEY }}
+       passphrase: ${{ secrets.PASSPHRASE }}
+       script: |
+        cd foodgram
+        sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram:latest
+        sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram_frontend:latest
+        sudo docker compose stop
+        sudo docker compose rm backend
+        sudo docker compose rm frontend
+        touch .env
+        echo DB_ENGINE=${{ secrets.DB_ENGINE }} >> .env
+        echo DB_NAME=${{ secrets.DB_NAME }} >> .env
+        echo POSTGRES_USER=${{ secrets.POSTGRES_USER }} >> .env
+        echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> .env
+        echo DB_HOST=${{ secrets.DB_HOST }} >> .env
+        echo DB_PORT=${{ secrets.DB_PORT }} >> .env
+        sudo docker compose up -d
+        sudo docker compose exec backend python manage.py migrate
+        sudo docker compose exec backend python manage.py collectstatic --no-input
+    - name: send_message if deploy failed
+      if: ${{ failure() }}
+      uses: appleboy/telegram-action@master
+      with:
+        to: ${{ secrets.TELEGRAM_TO }}
+        token: ${{ secrets.TELEGRAM_TOKEN }}
+        message: |
+          Ошибка деплоя на сервер  - ${{ secrets.HOST }}
+          https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    - name: send message on Discord if telegram failed
+      if: ${{ failure() }}
+      uses: sarisia/actions-status-discord@v1
+      with:
+        webhook: ${{ secrets.DISCORD_WEBHOOK }}
+        description: |
+          Не удалось отправить сообщение о результате workflow в Телеграм.
+          https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+  send_message:
+    runs-on: ubuntu-latest
+    if: ${{ success() }}
+    needs: [tests, build_and_push_to_docker_hub, deploy]
+    steps:
+    - name: send message on telegram
+      uses: appleboy/telegram-action@master
+      with:
+        to: ${{ secrets.TELEGRAM_TO }}
+        token: ${{ secrets.TELEGRAM_TOKEN }}
+        message: |
+          ${{ github.workflow }} успешно выполнен пользователем ${{ github.actor }}!
+          Причина: ${{ github.event.commits[0].message }}
+          https://github.com/${{ github.repository }}/commit/${{ github.sha }}
+    - name: send message on Discord if telegram failed
+      if: ${{ failure() }}
+      uses: sarisia/actions-status-discord@v1
+      with:
+        webhook: ${{ secrets.DISCORD_WEBHOOK }}
+        description: |
+          Не удалось отправить сообщение о результате workflow в Телеграм.
+          https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}

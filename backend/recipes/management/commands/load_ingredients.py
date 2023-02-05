@@ -12,7 +12,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         print("Начинаем импорт Ингредиентов")
 
-        path = os.path.join(settings.BASE_DIR, "../data", "ingredients.json")
+        path = os.path.join(settings.BASE_DIR, "./", "ingredients.json")
         print(path)
         ingredients = json.load(open(path, 'r', encoding="utf8"))
 

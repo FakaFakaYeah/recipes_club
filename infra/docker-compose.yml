@@ -1,17 +1,26 @@
-version: '3.3'
+version: '20.10.21'
+
 services:
+  db:
+    image: postgres:13.0-alpine
+    volumes:
+      - my_db:/var/lib/postgresql/data/
+    env_file:
+      - ./.env
 
   backend:
-    build: ../backend
+    image: fakafakayeah/foodgram:latest
     restart: always
     volumes:
       - static_value:/app/static/
       - media_value:/app/media/
+    depends_on:
+      - db
+    env_file:
+      - ./.env
 
   frontend:
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile
+    image: fakafakayeah/foodgram_frontend:latest
     volumes:
       - ../frontend/:/app/result_build/
   nginx:
@@ -28,5 +37,6 @@ services:
       - backend
 
 volumes:
+  my_db:
   static_value:
   media_value:

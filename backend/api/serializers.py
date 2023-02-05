@@ -31,10 +31,10 @@ class CustomUserSerializer(UserSerializer):
 
     def get_is_subscribed(self, obj):
         return (
-                self.context['request'].user.is_authenticated
-                and Follow.objects.filter(author=obj,
-                                          user=self.context['request'].user
-                                          ).exists()
+            self.context['request'].user.is_authenticated
+            and Follow.objects.filter(author=obj,
+                                      user=self.context['request'].user
+                                      ).exists()
         )
 
 
@@ -94,20 +94,20 @@ class RecipeReadSerializer(serializers.ModelSerializer):
 
     def get_is_favorited(self, obj):
         return (
-                self.context['request'].user.is_authenticated
-                and Favourites.objects.filter(
-                  recipe=obj,
-                  user=self.context['request'].user
-                  ).exists()
+            self.context['request'].user.is_authenticated
+            and Favourites.objects.filter(
+                recipe=obj,
+                user=self.context['request'].user
+            ).exists()
         )
 
     def get_is_in_shopping_cart(self, obj):
         return (
-                self.context['request'].user.is_authenticated
-                and ShoppingCart.objects.filter(
-                  recipe=obj,
-                  user=self.context['request'].user
-                ).exists()
+            self.context['request'].user.is_authenticated
+            and ShoppingCart.objects.filter(
+                recipe=obj,
+                user=self.context['request'].user
+            ).exists()
         )
 
 

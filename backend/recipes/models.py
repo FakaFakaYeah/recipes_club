@@ -131,7 +131,7 @@ class RecipeIngredient(models.Model):
             UniqueConstraint(
                 fields=['recipe', 'ingredient'], name='unique_ingredient'
             )
-            ]
+        ]
 
     def __str__(self):
         return f'{self.ingredient} --> {self.recipe}'
@@ -160,11 +160,6 @@ class BaseFavouritesAndShoppingCart(models.Model):
     class Meta:
         abstract = True
         ordering = ('-pub_date',)
-        constraints = [
-            UniqueConstraint(
-                fields=['user', 'recipe'], name='unique_add'
-            )
-        ]
 
     def __str__(self):
         return f'{self.user} --- > {self.recipe}'
@@ -175,6 +170,11 @@ class Favourites(BaseFavouritesAndShoppingCart):
 
     class Meta(BaseFavouritesAndShoppingCart.Meta):
         verbose_name_plural = 'Любимые рецепты'
+        constraints = [
+            UniqueConstraint(
+                fields=['user', 'recipe'], name='unique_favourites'
+            )
+        ]
 
 
 class ShoppingCart(BaseFavouritesAndShoppingCart):
@@ -182,3 +182,8 @@ class ShoppingCart(BaseFavouritesAndShoppingCart):
 
     class Meta(BaseFavouritesAndShoppingCart.Meta):
         verbose_name_plural = 'Рецепты в списке покупок'
+        constraints = [
+            UniqueConstraint(
+                fields=['user', 'recipe'], name='unique_shop'
+            )
+        ]
