@@ -1,6 +1,8 @@
 # **Продуктовый помощник**
 
-![](https://github.com/FakaFakaYeah/foodgram-project-react/actions/workflows/foodgram_workflow.yml/badge.svg)
+![](https://github.com/FakaFakaYeah/foodgram-project-react/actions/workflows/foodgram_main.yml/badge.svg)
+
+![img.png](/backend/static/img.png)
 
 ### Описание проекта:
 Сайт предназначен для публикации свои любимых рецептов, подписок на интересных
@@ -118,7 +120,7 @@ TELEGRAM_TO=<id чата, куда должны приходить уведом�
 
 TELEGRAM_TOKEN<= токен вашего бота-информатора в телеграмме>
 
-DISCORD_WEBHOOK<= Вебхук из чата в Discorde, для резервного информировани>
+DISCORD_WEBHOOK<= Вебхук из чата в Discord, для резервного информировани>
 ```
 
 
