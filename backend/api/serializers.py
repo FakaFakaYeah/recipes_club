@@ -128,13 +128,18 @@ class RecipeCreateSerializer(RecipeReadSerializer):
     @staticmethod
     def add_tags_and_ingredients(recipe, tags, ingredients):
         recipe.tags.set(tags)
-        RecipeIngredient.objects.bulk_create(
-            [RecipeIngredient(recipe=recipe,
-                              ingredient=get_object_or_404(
-                                  Ingredient, pk=ingredient['id']),
-                              amount=ingredient['amount'])
-             for ingredient in ingredients]
-        )
+        try:
+            RecipeIngredient.objects.bulk_create(
+                [RecipeIngredient(recipe=recipe,
+                                  ingredient=get_object_or_404(
+                                      Ingredient, pk=ingredient['id']),
+                                  amount=ingredient['amount'])
+                 for ingredient in ingredients]
+            )
+        except KeyError:
+            raise serializers.ValidationError(
+                'Укажите хотя бы один ингредиент!'
+            )
 
     def validate(self, data):
         ingredients = data.get('ingredients')
