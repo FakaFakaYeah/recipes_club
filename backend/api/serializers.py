@@ -1,24 +1,13 @@
 from django.shortcuts import get_object_or_404
-from djoser.serializers import UserSerializer, UserCreateSerializer
+from djoser.serializers import UserSerializer
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 
-from recipes.models import (
-    Tag, Ingredient, Recipe, RecipeIngredient, Favourites, ShoppingCart
-)
-from users.models import Follow, User
+from recipes.models import Tag, Ingredient, Recipe, RecipeIngredient
+from users.models import User
 
 
-class CustomCreateUserSerializer(UserCreateSerializer):
-    """Сериализатор для создания пользователя"""
-    class Meta:
-        model = User
-        fields = (
-            'email', 'id', 'username', 'first_name', 'last_name', 'password'
-        )
-
-
-class CustomUserSerializer(UserSerializer):
+class UserReadSerializer(UserSerializer):
     """Сериализатор для получения пользователей"""
     is_subscribed = serializers.SerializerMethodField()
 
@@ -30,12 +19,9 @@ class CustomUserSerializer(UserSerializer):
         )
 
     def get_is_subscribed(self, obj):
-        return (
-            self.context['request'].user.is_authenticated
-            and Follow.objects.filter(author=obj,
-                                      user=self.context['request'].user
-                                      ).exists()
-        )
+        user = self.context['request'].user
+        return (user.is_authenticated
+                and user.follower.filter(author=obj).exists())
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -76,11 +62,9 @@ class RecipeIngredientCreateSerializer(serializers.ModelSerializer):
 
 class RecipeReadSerializer(serializers.ModelSerializer):
     """Сериализатор для создания/редактирования/удаления рецептов"""
-    ingredients = RecipeIngredientSerializer(
-        many=True, source='recipeingredient_set'
-    )
+    ingredients = RecipeIngredientSerializer(many=True)
     tags = TagSerializer(many=True)
-    author = CustomUserSerializer(read_only=True)
+    author = UserSerializer(read_only=True)
     image = Base64ImageField()
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
@@ -93,22 +77,14 @@ class RecipeReadSerializer(serializers.ModelSerializer):
         )
 
     def get_is_favorited(self, obj):
-        return (
-            self.context['request'].user.is_authenticated
-            and Favourites.objects.filter(
-                recipe=obj,
-                user=self.context['request'].user
-            ).exists()
-        )
+        user = self.context['request'].user
+        return (user.is_authenticated
+                and user.favourites.filter(recipe=obj).exists())
 
     def get_is_in_shopping_cart(self, obj):
-        return (
-            self.context['request'].user.is_authenticated
-            and ShoppingCart.objects.filter(
-                recipe=obj,
-                user=self.context['request'].user
-            ).exists()
-        )
+        user = self.context['request'].user
+        return (user.is_authenticated
+                and user.shoppingcart.filter(recipe=obj).exists())
 
 
 class RecipeCreateSerializer(RecipeReadSerializer):
@@ -181,7 +157,7 @@ class RecipeMiniSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'image', 'cooking_time')
 
 
-class FollowSerializer(CustomUserSerializer):
+class FollowSerializer(UserReadSerializer):
     """Сериализатор для подписок/отписок"""
     recipes = serializers.SerializerMethodField()
     recipes_count = serializers.IntegerField(source='recipes.count')
@@ -197,5 +173,8 @@ class FollowSerializer(CustomUserSerializer):
         recipes_limit = self.context.get('request').GET.get('recipes_limit')
         queryset = obj.recipes.all()
         if recipes_limit:
-            queryset = queryset[:int(recipes_limit)]
+            try:
+                queryset = queryset[:int(recipes_limit)]
+            except ValueError:
+                raise serializers.ValidationError('В лимите рецептов не число')
         return RecipeMiniSerializer(queryset, many=True).data

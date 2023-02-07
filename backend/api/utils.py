@@ -1,11 +1,45 @@
+import io
+
+from django.conf import settings
+from django.http import FileResponse
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfgen.canvas import Canvas
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
 
+def shopping_cart_page_create(ingredients):
+    """Функция создания списка покупок в PDF"""
+    buffer = io.BytesIO()
+    c = Canvas(buffer)
+    pdfmetrics.registerFont(
+        TTFont('Bad_Comic', 'Bad_Comic.ttf', 'UTF-8'))
+    page_template(c)
+    y = 700
+    ingredient_number = 1
+    for ingredient in ingredients:
+        c.drawCentredString(35, y, str(ingredient_number))
+        c.drawCentredString(200, y, f"{ingredient['ingredient__name']}")
+        c.drawCentredString(380, y, f"{ingredient['amount']}")
+        c.drawCentredString(
+            500, y, f"{ingredient['ingredient__measurement_unit']}"
+        )
+        y -= 25
+        if ingredient_number % settings.ING_IN_PAGE == settings.ING_INDEX:
+            c.showPage()
+            page_template(c)
+            y = 700
+        ingredient_number += 1
+    c.save()
+    buffer.seek(0)
+    return FileResponse(buffer, as_attachment=True,
+                        filename='Список покупок.pdf')
+
+
 def page_template(c):
-    """Шаблон страницы листа PDF, если
-    список покупок будет очень большой"""
+    """Шаблон страницы листа PDF"""
     c.setFont('Bad_Comic', size=25)
     c.drawCentredString(297, 800, 'Список покупок!')
     c.drawCentredString(297, 20, 'Удачных покупок!')

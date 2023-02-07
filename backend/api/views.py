@@ -1,16 +1,9 @@
-import io
-
-from django.conf import settings
 from django.db.models import Sum
-from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from djoser.views import UserViewSet
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.pdfgen.canvas import Canvas
 from rest_framework import viewsets
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.generics import ListAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from recipes.models import (
@@ -22,43 +15,30 @@ from .pagination import CustomPagination
 from .permissions import IsAuthorOrReadOnly
 from .serializers import (
     TagSerializer, IngredientSerializer, RecipeReadSerializer,
-    RecipeCreateSerializer, FollowSerializer, RecipeMiniSerializer
+    RecipeCreateSerializer, RecipeMiniSerializer, FollowSerializer
 )
-from .utils import universal_post, universal_delete, page_template
+from .utils import universal_post, universal_delete, shopping_cart_page_create
 
 
-class CustomUserViewSet(UserViewSet):
-    """Вьюсет для работы с аутификацией и подписками"""
-    queryset = User.objects.all()
-    http_method_names = ('get', 'post', 'delete')
+class FollowList(ListAPIView):
+    """Получение списка подписок"""
+    serializer_class = FollowSerializer
     pagination_class = CustomPagination
 
-    @staticmethod
-    def __get_author(pk):
-        return get_object_or_404(User, pk=pk)
+    def get_queryset(self):
+        return User.objects.filter(following__user=self.request.user)
 
-    @action(
-        detail=False,
-        permission_classes=(IsAuthenticated,)
-    )
-    def subscriptions(self, request):
-        page = self.paginate_queryset(
-            User.objects.filter(following__user=request.user)
-        )
-        serializer = FollowSerializer(page, many=True,
-                                      context={'request': request})
-        return self.get_paginated_response(serializer.data)
 
-    @action(
-        detail=True, methods=['post', 'delete'],
-        permission_classes=(IsAuthenticated,)
-    )
-    def subscribe(self, request, id=None):
-        obj_dict = {'user': request.user, 'author': self.__get_author(id)}
-        if request.method == 'POST':
-            return universal_post(obj_dict, Follow, obj_dict['author'],
-                                  FollowSerializer, {'request': request})
-        return universal_delete(obj_dict, Follow, obj_dict['author'])
+@api_view(['POST', 'DELETE'])
+@permission_classes([IsAuthenticated])
+def subscribe(request, author_id=None):
+    """Метод подписки и отписки на авторов"""
+    filter_params = {'user': request.user,
+                     'author': get_object_or_404(User, pk=author_id)}
+    if request.method == 'POST':
+        return universal_post(filter_params, Follow, filter_params['author'],
+                              FollowSerializer, {'request': request})
+    return universal_delete(filter_params, Follow, filter_params['author'])
 
 
 class IngredientsViewSet(viewsets.ReadOnlyModelViewSet):
@@ -101,22 +81,30 @@ class RecipeViewSet(viewsets.ModelViewSet):
         permission_classes=(IsAuthenticated,)
     )
     def favorite(self, request, pk=None):
-        obj_dict = {'user': request.user, 'recipe': self.__get_recipe(pk)}
+        filter_params = {'user': request.user, 'recipe': self.__get_recipe(pk)}
         if request.method == 'POST':
-            return universal_post(obj_dict, Favourites, obj_dict['recipe'],
-                                  RecipeMiniSerializer, {'request': request})
-        return universal_delete(obj_dict, Favourites, obj_dict['recipe'])
+            return universal_post(
+                filter_params, Favourites, filter_params['recipe'],
+                RecipeMiniSerializer, {'request': request}
+            )
+        return universal_delete(
+            filter_params, Favourites, filter_params['recipe']
+        )
 
     @action(
         detail=True, methods=['post', 'delete'],
         permission_classes=(IsAuthenticated,)
     )
     def shopping_cart(self, request, pk=None):
-        obj_dict = {'user': request.user, 'recipe': self.__get_recipe(pk)}
+        filter_params = {'user': request.user, 'recipe': self.__get_recipe(pk)}
         if request.method == 'POST':
-            return universal_post(obj_dict, ShoppingCart, obj_dict['recipe'],
-                                  RecipeMiniSerializer, {'request': request})
-        return universal_delete(obj_dict, ShoppingCart, obj_dict['recipe'])
+            return universal_post(
+                filter_params, ShoppingCart, filter_params['recipe'],
+                RecipeMiniSerializer, {'request': request}
+            )
+        return universal_delete(
+            filter_params, ShoppingCart, filter_params['recipe']
+        )
 
     @action(detail=False, permission_classes=(IsAuthenticated,))
     def download_shopping_cart(self, request):
@@ -124,27 +112,4 @@ class RecipeViewSet(viewsets.ModelViewSet):
             recipe__shoppingcart__user=request.user).values(
             'ingredient__name', 'ingredient__measurement_unit').annotate(
             amount=Sum('amount'))
-        buffer = io.BytesIO()
-        c = Canvas(buffer)
-        pdfmetrics.registerFont(
-            TTFont('Bad_Comic', 'Bad_Comic.ttf', 'UTF-8'))
-        page_template(c)
-        y = 700
-        ingredient_number = 1
-        for ingredient in ingredients:
-            c.drawCentredString(35, y, str(ingredient_number))
-            c.drawCentredString(200, y, f"{ingredient['ingredient__name']}")
-            c.drawCentredString(380, y, f"{ingredient['amount']}")
-            c.drawCentredString(
-                500, y, f"{ingredient['ingredient__measurement_unit']}"
-            )
-            y -= 25
-            if ingredient_number % settings.ING_IN_PAGE == settings.ING_INDEX:
-                c.showPage()
-                page_template(c)
-                y = 700
-            ingredient_number += 1
-        c.save()
-        buffer.seek(0)
-        return FileResponse(buffer, as_attachment=True,
-                            filename='Список покупок.pdf')
+        return shopping_cart_page_create(ingredients)

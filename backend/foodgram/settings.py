@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'c5@-d*^ch+tn^8wi9ts^9&mjt!u4@0!=bs*x70#&%m*2hho)ye'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -86,12 +86,8 @@ AUTH_USER_MODEL = 'users.User'
 
 DATABASES = {
     'default': {
-        'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.postgresql'),
-        'NAME': os.getenv('DB_NAME', default='postgres'),
-        'USER': os.getenv('POSTGRES_USER', default='postgres'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', default='postgres'),
-        'HOST': os.getenv('DB_HOST', default='db'),
-        'PORT': os.getenv('DB_PORT', default='5432')
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
 
@@ -153,12 +149,10 @@ REST_FRAMEWORK = {
 # Настройки Djoser
 
 DJOSER = {
-    'LOGIN_FIELD': 'email',
     'HIDE_USERS': False,
     'SERIALIZERS': {
-        'current_user': 'api.serializers.CustomUserSerializer',
-        'user_create': 'api.serializers.CustomCreateUserSerializer',
-        'user': 'api.serializers.CustomUserSerializer',
+        'current_user': 'api.serializers.UserReadSerializer',
+        'user': 'api.serializers.UserReadSerializer',
     },
     'PERMISSIONS': {
         'user': ('rest_framework.permissions.IsAuthenticated',),
@@ -179,3 +173,5 @@ MAX_COOK_TIME = 10080  # Максимальное время приготовл�
 MIN_AMOUNT = 1  # Минимальное количество ингредиента
 ING_IN_PAGE = 26  # Количество ингредиентов на одной странице в списке покупок
 ING_INDEX = 0  # Значение, которое создает новую страницу со списком покупок
+FIELD_LENGTH = 200  # Максимальная длинна поля в моделях рецептов
+FIELD_LENGTH_USER = 150  # Максимальная длинна поля в модели юзеров
