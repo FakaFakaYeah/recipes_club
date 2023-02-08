@@ -18,7 +18,7 @@ class RecipeFilter(FilterSet):
 
     class Meta:
         model = Recipe
-        fields = {'author',}
+        fields = {'author'}
 
     def get_is_favorited(self, queryset, name, value):
         if value and self.request.user.is_authenticated:
