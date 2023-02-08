@@ -31,4 +31,4 @@ class CustomUser(UserAdmin):
 @admin.register(Follow)
 class FollowAdmin(admin.ModelAdmin):
     """Админ панель для подписок"""
-    list_display = ('__str__', 'pub_date')
+    list_display = ('__str__',)

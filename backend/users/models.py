@@ -10,7 +10,7 @@ from .validators import validate_username
 class User(AbstractUser):
     """Собственная модель пользователей"""
     email = models.EmailField(
-        max_length=254,
+        max_length=settings.MAX_LENGTH_EMAIL,
         unique=True
     )
     username = models.CharField(
@@ -58,14 +58,10 @@ class Follow(models.Model):
         related_name='following',
         verbose_name='На кого подписывается'
     )
-    pub_date = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name='Дата подписки'
-    )
 
     class Meta:
         verbose_name_plural = 'Подписки'
-        ordering = ('-pub_date',)
+        ordering = ('-id',)
         constraints = [
             UniqueConstraint(fields=['user', 'author'], name='unique_follow'),
             CheckConstraint(check=~Q(user=F('author')),
@@ -73,4 +69,4 @@ class Follow(models.Model):
         ]
 
     def __str__(self):
-        return f'{self.user.username} --> {self.user.username}'
+        return f'{self.user.username} --> {self.author.username}'

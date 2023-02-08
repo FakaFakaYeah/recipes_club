@@ -7,7 +7,7 @@ from rest_framework.generics import ListAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from recipes.models import (
-    Ingredient, Tag, Recipe, Favourites, ShoppingCart, RecipeIngredient
+    Ingredient, Tag, Recipe, Favourites, ShoppingCart
 )
 from users.models import User, Follow
 from .filters import RecipeFilter, IngredientsFilter
@@ -108,8 +108,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, permission_classes=(IsAuthenticated,))
     def download_shopping_cart(self, request):
-        ingredients = RecipeIngredient.objects.filter(
-            recipe__shoppingcart__user=request.user).values(
-            'ingredient__name', 'ingredient__measurement_unit').annotate(
-            amount=Sum('amount'))
+        ingredients = request.user.shoppingcart.values(
+            'recipe__ingredients__ingredient__name',
+            'recipe__ingredients__ingredient__measurement_unit'
+        ).order_by('recipe__ingredients__ingredient__name').annotate(
+            total=Sum('recipe__ingredients__amount'))
+        print(ingredients)
         return shopping_cart_page_create(ingredients)

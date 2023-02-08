@@ -19,12 +19,15 @@ def shopping_cart_page_create(ingredients):
     page_template(c)
     y = 700
     ingredient_number = 1
-    for ingredient in ingredients:
+    for ing in ingredients:
         c.drawCentredString(35, y, str(ingredient_number))
-        c.drawCentredString(200, y, f"{ingredient['ingredient__name']}")
-        c.drawCentredString(380, y, f"{ingredient['amount']}")
         c.drawCentredString(
-            500, y, f"{ingredient['ingredient__measurement_unit']}"
+            200, y, f"{ing['recipe__ingredients__ingredient__name']}")
+        c.drawCentredString(
+            380, y, f"{ing['total']}")
+        c.drawCentredString(
+            500, y,
+            f"{ing['recipe__ingredients__ingredient__measurement_unit']}"
         )
         y -= 25
         if ingredient_number % settings.ING_IN_PAGE == settings.ING_INDEX:
