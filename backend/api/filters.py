@@ -22,12 +22,12 @@ class RecipeFilter(FilterSet):
 
     def get_is_favorited(self, queryset, name, value):
         if value:
-            return self.request.user.favourites.all()
+            return self.request.user.favourites.values('recipe')
         return queryset
 
     def get_is_in_shopping_cart(self, queryset, name, value):
         if value:
-            return self.request.user.shoppingcart.all()
+            return self.request.user.shoppingcart.values('recipe')
         return queryset
 
 
