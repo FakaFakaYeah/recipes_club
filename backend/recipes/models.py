@@ -149,7 +149,6 @@ class BaseFavouritesAndShoppingCart(models.Model):
     )
     recipe = models.ForeignKey(
         Recipe,
-        related_name='+',
         on_delete=models.CASCADE,
         verbose_name='Рецепт'
     )
