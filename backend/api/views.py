@@ -113,5 +113,4 @@ class RecipeViewSet(viewsets.ModelViewSet):
             'recipe__ingredients__ingredient__measurement_unit'
         ).order_by('recipe__ingredients__ingredient__name').annotate(
             total=Sum('recipe__ingredients__amount'))
-        print(ingredients)
         return shopping_cart_page_create(ingredients)
