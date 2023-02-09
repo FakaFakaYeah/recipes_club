@@ -20,7 +20,10 @@ class User(AbstractUser):
                   'Только буквы, цифры и символы @/./+/-/_.',
         error_messages={'unique': 'Данное имя пользователя уже занято!'},
         validators=[
-            RegexValidator(regex=r'^[a-zA-Zа-яА-Я0-9@/./+/-/_]+$'),
+            RegexValidator(
+                regex=r'^[a-zA-Zа-яА-Я0-9@/./+/-/_]+$',
+                message='Введите корректное имя пользователя'
+            ),
             validate_username
         ],
         verbose_name='Имя пользователя'
