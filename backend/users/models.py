@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
-from django.contrib.auth.validators import UnicodeUsernameValidator
+from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models import UniqueConstraint, CheckConstraint, Q, F
 
@@ -19,7 +19,10 @@ class User(AbstractUser):
         help_text='Обязательное поле. Не более 150 символов. '
                   'Только буквы, цифры и символы @/./+/-/_.',
         error_messages={'unique': 'Данное имя пользователя уже занято!'},
-        validators=[UnicodeUsernameValidator, validate_username],
+        validators=[
+            RegexValidator(regex=r'^[a-zA-Zа-яА-Я0-9@/./+/-/_]+$'),
+            validate_username
+        ],
         verbose_name='Имя пользователя'
     )
     first_name = models.CharField(

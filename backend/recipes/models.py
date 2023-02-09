@@ -1,6 +1,8 @@
 from colorfield.fields import ColorField
 from django.conf import settings
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import (
+    MinValueValidator, MaxValueValidator, RegexValidator
+)
 from django.db import models
 from django.db.models import UniqueConstraint
 
@@ -65,7 +67,8 @@ class Recipe(models.Model):
     )
     name = models.CharField(
         max_length=settings.FIELD_LENGTH,
-        verbose_name='Название'
+        verbose_name='Название',
+        validators=[RegexValidator(regex=r'^[А-Яа-яA-Za-z\s]+$')]
     )
     image = models.ImageField(
         upload_to='recipes/images',
