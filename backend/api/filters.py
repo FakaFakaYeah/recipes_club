@@ -21,7 +21,9 @@ class RecipeFilter(FilterSet):
         fields = {'author', }
 
     def get_recipes(self, related_name):
-        recipes = getattr(self.request.user, related_name).values_list('recipe', flat=True)
+        recipes = getattr(self.request.user, related_name).values_list(
+            'recipe', flat=True
+        )
         return Recipe.objects.filter(id__in=recipes)
 
     def get_is_favorited(self, queryset, name, value):
