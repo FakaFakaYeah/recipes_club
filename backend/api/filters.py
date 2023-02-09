@@ -20,14 +20,18 @@ class RecipeFilter(FilterSet):
         model = Recipe
         fields = {'author', }
 
+    def get_recipes(self, related_name):
+        recipes = getattr(self.request.user, related_name).values_list('recipe', flat=True)
+        return Recipe.objects.filter(id__in=recipes)
+
     def get_is_favorited(self, queryset, name, value):
         if value:
-            return self.request.user.favourites.all().values('recipe')
+            return self.get_recipes('favourites')
         return queryset
 
     def get_is_in_shopping_cart(self, queryset, name, value):
         if value:
-            return self.request.user.shoppingcart.all().values('recipe')
+            return self.get_recipes('shoppingcart')
         return queryset
 
 
