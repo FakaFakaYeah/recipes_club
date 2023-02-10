@@ -16,7 +16,7 @@ class User(AbstractUser):
     username = models.CharField(
         max_length=settings.FIELD_LENGTH_USER,
         unique=True,
-        help_text='Обязательное поле. Не более 150 символов. '
+        help_text='Обязательное поле. Не более 150 символов, без пробелов. '
                   'Только буквы, цифры и символы @/./+/-/_.',
         error_messages={'unique': 'Данное имя пользователя уже занято!'},
         validators=[

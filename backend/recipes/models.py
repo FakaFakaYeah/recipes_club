@@ -36,6 +36,7 @@ class Tag(models.Model):
     """Модель тэгов"""
     name = models.CharField(
         max_length=settings.FIELD_LENGTH,
+        help_text='Только буквы, пробелы разрешены.',
         unique=True,
         verbose_name='Название тега'
     )
