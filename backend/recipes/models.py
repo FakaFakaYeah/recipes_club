@@ -36,7 +36,6 @@ class Tag(models.Model):
     """Модель тэгов"""
     name = models.CharField(
         max_length=settings.FIELD_LENGTH,
-        help_text='Только буквы, пробелы разрешены.',
         unique=True,
         verbose_name='Название тега'
     )
@@ -69,6 +68,7 @@ class Recipe(models.Model):
     name = models.CharField(
         max_length=settings.FIELD_LENGTH,
         verbose_name='Название',
+        help_text='Только буквы, пробелы разрешены.',
         validators=[RegexValidator(
             regex=r'^[А-Яа-яA-Za-z\s]+$',
             message='Введите корректное название рецепта'
