@@ -13,9 +13,9 @@
 
 Проект доступен по адресам: 
 
-http://recipesgram.ddns.net/
+http://recipesgram.ddns.net/recipes/
 
-http://81.163.31.244/  
+http://81.163.31.244/recipes/  
 
 
 ### Данные для авторизации в админ-зоне и на сайте:
