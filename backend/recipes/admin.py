@@ -25,6 +25,7 @@ class TagAdmin(admin.ModelAdmin):
 class IngredientInRecipeInline(admin.TabularInline):
     """Позволяет добавлять ингредиенты на странице рецепта"""
     model = RecipeIngredient
+    min_num = 1
 
 
 @admin.register(Recipe)
