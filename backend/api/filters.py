@@ -18,7 +18,7 @@ class RecipeFilter(FilterSet):
 
     class Meta:
         model = Recipe
-        fields = {'author', }
+        fields = ('author', 'is_favorited', 'tags')
 
     def get_recipes(self, related_name):
         recipes = getattr(self.request.user, related_name).values_list(

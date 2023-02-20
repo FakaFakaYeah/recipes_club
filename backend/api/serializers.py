@@ -1,4 +1,3 @@
-from django.shortcuts import get_object_or_404
 from djoser.serializers import UserSerializer
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
@@ -53,7 +52,7 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
 
 class RecipeIngredientCreateSerializer(serializers.ModelSerializer):
     """Сериализатор для создания списка ингредиентов"""
-    id = serializers.IntegerField()
+    id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all())
 
     class Meta:
         model = RecipeIngredient
@@ -108,8 +107,7 @@ class RecipeCreateSerializer(RecipeReadSerializer):
         try:
             RecipeIngredient.objects.bulk_create(
                 [RecipeIngredient(recipe=recipe,
-                                  ingredient=get_object_or_404(
-                                      Ingredient, pk=ingredient['id']),
+                                  ingredient=ingredient['id'],
                                   amount=ingredient['amount'])
                  for ingredient in ingredients]
             )
