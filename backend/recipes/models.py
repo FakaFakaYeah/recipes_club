@@ -7,6 +7,7 @@ from django.db import models
 from django.db.models import UniqueConstraint
 
 from users.models import User
+from .validators import image_size
 
 
 class Ingredient(models.Model):
@@ -76,7 +77,8 @@ class Recipe(models.Model):
     )
     image = models.ImageField(
         upload_to='recipes/images',
-        verbose_name='Фото'
+        verbose_name='Фото',
+        validators=[image_size]
     )
     text = models.TextField(
         verbose_name='Описание',
