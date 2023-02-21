@@ -1,9 +1,7 @@
 from django.core.exceptions import ValidationError
 
-from foodgram.settings import SIZE_IMAGE
-
 
 def image_size(value):
-    if value.size > SIZE_IMAGE:
-        raise ValidationError('Картинки размером больше 1Mb не поддерживаются')
+    if value.size > 0.1 * 1024 * 1024:
+        raise ValidationError('Слишком большое фото!')
     return value
