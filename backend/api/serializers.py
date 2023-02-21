@@ -103,7 +103,7 @@ class RecipeCreateSerializer(RecipeReadSerializer):
 
     @staticmethod
     def validate_image(value):
-        if value.size > 0.1 * 1024 * 1024:
+        if value.size > 1 * 1024 * 1024:
             raise serializers.ValidationError(
                 'Картинки размером больше 1Mb не поддерживаются'
             )
