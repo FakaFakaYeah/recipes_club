@@ -3,6 +3,7 @@ from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 from django.conf import settings
 
+from foodgram.settings import SIZE_IMAGE
 from recipes.models import Tag, Ingredient, Recipe, RecipeIngredient
 from users.models import User
 
@@ -104,7 +105,7 @@ class RecipeCreateSerializer(RecipeReadSerializer):
 
     @staticmethod
     def validate_image(value):
-        if value.size > settings.SIZE_IMAGE:
+        if value.size > SIZE_IMAGE:
             raise serializers.ValidationError(
                 'Картинки размером больше 1Mb не поддерживаются'
             )
