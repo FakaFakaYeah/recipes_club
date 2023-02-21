@@ -4,5 +4,5 @@ from django.conf import settings
 
 def image_size(value):
     if value.size > settings.MAX_SIZE_IMAGE:
-        raise ValidationError('Слишком большое фото!')
+        raise ValidationError('Картинки размером больше 1Mb не поддерживаются')
     return value
