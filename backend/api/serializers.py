@@ -1,7 +1,6 @@
 from djoser.serializers import UserSerializer
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
-from django.conf import settings
 
 from foodgram.settings import SIZE_IMAGE
 from recipes.models import Tag, Ingredient, Recipe, RecipeIngredient
