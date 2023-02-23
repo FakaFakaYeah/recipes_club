@@ -96,6 +96,7 @@ jobs:
         cd foodgram
         sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram:latest
         sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram_frontend:latest
+        docker image prune -a
         sudo docker compose stop
         sudo docker compose rm backend
         sudo docker compose rm frontend
