@@ -96,7 +96,6 @@ jobs:
         cd foodgram
         sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram:latest
         sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram_frontend:latest
-        docker image prune --force
         sudo docker compose stop
         sudo docker compose rm backend
         sudo docker compose rm frontend
@@ -108,6 +107,7 @@ jobs:
         echo DB_HOST=${{ secrets.DB_HOST }} >> .env
         echo DB_PORT=${{ secrets.DB_PORT }} >> .env
         sudo docker compose up -d
+        sudo docker image prune --force
         sudo docker compose exec backend python manage.py migrate
         sudo docker compose exec backend python manage.py collectstatic --no-input
     - name: send_message if deploy failed

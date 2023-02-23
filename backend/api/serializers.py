@@ -24,7 +24,7 @@ class UserReadSerializer(UserSerializer):
 
 
 class IngredientSerializer(serializers.ModelSerializer):
-    """Сериализатор ингредиентов """
+    """Сериализатор ингредиентов"""
     class Meta:
         model = Ingredient
         fields = '__all__'
