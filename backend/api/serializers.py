@@ -1,6 +1,7 @@
 from djoser.serializers import UserSerializer
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
+from django.conf import settings
 
 from recipes.models import Tag, Ingredient, Recipe, RecipeIngredient
 from users.models import User
@@ -103,10 +104,11 @@ class RecipeCreateSerializer(RecipeReadSerializer):
 
     @staticmethod
     def validate_image(value):
-        if value.size > 1 * 1024 * 1024:
+        if value.size > settings.MAX_SIZE_IMAGE:
             raise serializers.ValidationError(
                 'Картинки размером больше 1Mb не поддерживаются'
             )
+        return value
 
     @staticmethod
     def add_tags_and_ingredients(recipe, tags, ingredients):
