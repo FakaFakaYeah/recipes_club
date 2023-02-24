@@ -32,7 +32,7 @@ class RecipeFilter(FilterSet):
         return queryset
 
     def get_is_in_shopping_cart(self, queryset, name, value):
-        if value and not self.request.user.is_anonymous:
+        if value:
             return self.get_recipes('shoppingcart')
         return queryset
 
