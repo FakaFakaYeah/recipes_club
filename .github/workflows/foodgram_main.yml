@@ -93,7 +93,7 @@ jobs:
        key: ${{ secrets.SSH_KEY }}
        passphrase: ${{ secrets.PASSPHRASE }}
        script: |
-        cd foodgram
+        cd foodgram_project/foodgram/
         sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram:latest
         sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram_frontend:latest
         sudo docker compose stop
