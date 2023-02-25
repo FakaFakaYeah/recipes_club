@@ -1,4 +1,4 @@
-from django.db.models import Sum
+from django.db.models import Sum, OuterRef, Exists
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
@@ -66,6 +66,16 @@ class RecipeViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPagination
     filter_backends = (DjangoFilterBackend,)
     filter_class = RecipeFilter
+
+    def get_queryset(self):
+        return Recipe.objects.annotate(
+            is_favorited=Exists(
+                Favourites.objects.filter(
+                    user=self.request.user, recipe=OuterRef('id'))),
+            is_in_shopping_cart=Exists(
+                ShoppingCart.objects.filter(
+                    user=self.request.user,
+                    recipe=OuterRef('id'))))
 
     @staticmethod
     def __get_recipe(pk):
