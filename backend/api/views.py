@@ -60,7 +60,6 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 class RecipeViewSet(viewsets.ModelViewSet):
     """Вьюсет для работы с рецептами, добавлением их в
     избранное и список покупок + скачивание списка покупок"""
-    queryset = Recipe.objects.all()
     http_method_names = ('get', 'post', 'patch', 'delete')
     permission_classes = (IsAuthorOrReadOnly,)
     pagination_class = CustomPagination
