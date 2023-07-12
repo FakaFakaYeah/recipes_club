@@ -1,6 +1,6 @@
-# **Продуктовый помощник**
+# **Клуб любителей рецептов**
 
-![](https://github.com/FakaFakaYeah/foodgram-project-react/actions/workflows/foodgram_main.yml/badge.svg)
+![](https://github.com/FakaFakaYeah/recipes_club/actions/workflows/foodgram_main.yml/badge.svg)
 
 ![img.png](/data/img.png)
 

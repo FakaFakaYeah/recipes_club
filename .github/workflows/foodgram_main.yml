@@ -1,4 +1,4 @@
-name: Project Foodgram
+name: Recipes Club
 on: [push]
 jobs:
 
