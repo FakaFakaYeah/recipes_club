@@ -5,7 +5,7 @@
 ![img.png](/data/img.png)
 
 
-
+---
 ### Описание проекта:
 Сайт предназначен для публикации свои любимых рецептов, подписок на интересных
 авторов. Есть возможность добавлять рецепты в избранные и свой список продуктов,
@@ -13,25 +13,28 @@
 
 Проект доступен по адресам:
 
+```
 http://recipesgram.ddns.net/recipes/
 
-http://81.163.31.244/recipes/  
+http://81.163.31.244/recipes/ 
+``` 
 
-
-### Данные для авторизации в админ-зоне и на сайте:
+---
+### Данные для авторизации в админ-зоне и на сайте:<a name="auth"></a>
 
 ```
 email: test@test.ru
 пароль: 1029384756
 ```
-
-### **Используемые технологии**
+---
+### **Используемые технологии**<a name="stack"></a>
 ![](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![](https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=green)
 ![](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
 ![](https://img.shields.io/badge/DJANGO-REST-ff1709?style=for-the-badge&logo=django&logoColor=white&color=ff1709&labelColor=gray)
 ![](https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white)
 ![](https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)
+---
 
 ### Архитектура проекта<a name="architecture"></a>
 
@@ -42,7 +45,8 @@ email: test@test.ru
 | `src/backend` | Код Django приложения                                    |
 | `src/bot`     | Код бота                                                 |
 
-### **Как развернуть проект локально?**
+---
+### Как развернуть проект локально?<a name="start_project"></a>
 * Запустите терминал и клонируйте репозиторий 
     ```
     git clone https://github.com/FakaFakaYeah/foodgram-project-react/
@@ -78,8 +82,9 @@ email: test@test.ru
     ```
     docker-compose exec backend python manage.py migrate
     ```
+---
 
-### Создание суперпользователя
+### Создание суперпользователя<a name="superuser"></a>
 По следующей команде вы можете создать суперпользователя, если вам нужен доступ в админ зону
 ```
 docker-compose exec backend python manage.py createsuperuser
@@ -88,7 +93,8 @@ docker-compose exec backend python manage.py createsuperuser
 
 После успешного создания суперпользователя и ввода логин/пароль на страницу http://127.0.0.1/admin/ 
 
-### Заполнение базы начальными ингредиентами
+---
+### Заполнение базы начальными ингредиентами<a name="load_data"></a>
 
 Ингредиенты хранятся в файле ingredients.json.
 Для заполнения базы этими данными выполните следующую команду менеджера из директории с manage.py:
@@ -99,7 +105,8 @@ docker-compose exec backend python manage.py load_ingredients
 
 API запросы можно протестировать через приложение Postman, которое можно скачать по ссылке: https://www.postman.com/downloads/
 
-### Workflow
+---
+### Workflow<a name="workflow"></a>
 
 В проекте есть готовый шаблон workflow, в котором есть тесты по PEP8, пуш образов
 бэкенда и фронтеда на DockerHub, деплой на боевой сервер и информирование в telegram и discord.
@@ -137,9 +144,10 @@ TELEGRAM_TOKEN<= токен вашего бота-информатора в те
 
 DISCORD_WEBHOOK<= Вебхук из чата в Discord, для резервного информировани>
 ```
+---
 
-
-Проект выполнил: Смирнов Степан
+### Авторы проекта:
+Смирнов Степан
 <div>
   <a href="https://github.com/FakaFakaYeah">
     <img src="https://github.com/FakaFakaYeah/FakaFakaYeah/blob/main/files/images/GitHub.png" title="GitHub" alt="Github" width="39" height="39"/>&nbsp
