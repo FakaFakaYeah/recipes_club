@@ -4,18 +4,18 @@
 
 ![img.png](/data/img.png)
 
-<b> Оглавление</b>
-    <ol>
-     <li><a href="#description">Описание проекта</a></li>
-     <li><a href="#auth">Данные для авторизации в админ-зоне и на сайте</a></li>
-     <li><a href="#stack">Используемые технологии</a></li>
-     <li><a href="#architecture">Архитектура проекта</a></li>
-     <li><a href="#start_project">Как развернуть проект локально?</a></li>
-     <li><a href="#superuser">Создание суперпользователя</a></li>
-     <li><a href="#load_data">Заполнение базы начальными ингредиентами</a></li>
-     <li><a href="#workflow">Workflow</a></li>
-     <li><a href="#author">Авторы проекта</a></li>
-    </ol>
+### Оглавление
+<ol>
+ <li><a href="#description">Описание проекта</a></li>
+ <li><a href="#auth">Данные для авторизации в админ-зоне и на сайте</a></li>
+ <li><a href="#stack">Используемые технологии</a></li>
+ <li><a href="#architecture">Архитектура проекта</a></li>
+ <li><a href="#start_project">Как развернуть проект локально?</a></li>
+ <li><a href="#superuser">Создание суперпользователя</a></li>
+ <li><a href="#load_data">Заполнение базы начальными ингредиентами</a></li>
+ <li><a href="#workflow">Workflow</a></li>
+ <li><a href="#author">Авторы проекта</a></li>
+</ol>
 
 
 ---
