@@ -33,35 +33,44 @@ email: test@test.ru
 ![](https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white)
 ![](https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)
 
+### Архитектура проекта<a name="architecture"></a>
+
+| Директория    | Описание                                                 |
+|---------------|----------------------------------------------------------|
+| `docs`        | Содержит схему архитектуры проекта в разных расширениях  |
+| `infra`       | Файлы для запуска с помощью Docker, настройки Nginx      |
+| `src/backend` | Код Django приложения                                    |
+| `src/bot`     | Код бота                                                 |
+
 ### **Как развернуть проект локально?**
-Запустите терминал и клонируйте репозиторий 
-```
-https://github.com/FakaFakaYeah/foodgram-project-react/
-```
+* Запустите терминал и клонируйте репозиторий 
+    ```
+    git clone https://github.com/FakaFakaYeah/foodgram-project-react/
+    ```
 
-Установите Docker по ссылке https://www.docker.com/products/docker-desktop
+* Установите Docker по ссылке https://www.docker.com/products/docker-desktop
 
-Перейдите в директорию с Docker-compose.yaml
-```
-cd infra
-```
+* Перейдите в директорию с Docker-compose.yaml
+    ```
+    cd infra
+    ```
 
-Создайте .env файл и заполните его
+* Создайте .env файл и заполните его
 
-Шаблон наполнения env файла
-```
-DB_ENGINE=django.db.backends.postgresql   указываем, что работаем с postgresql
-DB_NAME=   имя базы данных
-POSTGRES_USER=   логин для подключения к базе данных
-POSTGRES_PASSWORD=   пароль для подключения к БД (установите свой)
-DB_HOST=db   название сервиса (контейнера)
-DB_PORT=  порт для подключения к БД
-```
+  Шаблон наполнения env файла
+    ```
+    DB_ENGINE=django.db.backends.postgresql   указываем, что работаем с postgresql
+    DB_NAME=   имя базы данных
+    POSTGRES_USER=   логин для подключения к базе данных
+    POSTGRES_PASSWORD=   пароль для подключения к БД (установите свой)
+    DB_HOST=db   название сервиса (контейнера)
+    DB_PORT=  порт для подключения к БД
+    ```
 
-Выполните команду по разворачиванию docker-compose
-```
-docker-compose up -d
-```
+* Выполните команду по разворачиванию docker-compose
+    ```
+    docker-compose up -d
+    ```
 
 Будет проведена сборка образа по Dockerfile и запуск проекта в четырех контейнерах
 
@@ -93,7 +102,7 @@ API запросы можно протестировать через прило
 ### Workflow
 
 В проекте есть готовый шаблон workflow, в котором есть тесты по PEP8, пуш образов
-бэкенда и фронтеда на DockerHub, деплой на боевой серве и информирование в telegram и discord.
+бэкенда и фронтеда на DockerHub, деплой на боевой сервер и информирование в telegram и discord.
 
 В workflow используются следующие константы:
 
@@ -131,3 +140,11 @@ DISCORD_WEBHOOK<= Вебхук из чата в Discord, для резервно
 
 
 Проект выполнил: Смирнов Степан
+<div>
+  <a href="https://github.com/FakaFakaYeah">
+    <img src="https://github.com/FakaFakaYeah/FakaFakaYeah/blob/main/files/images/GitHub.png" title="GitHub" alt="Github" width="39" height="39"/>&nbsp
+  </a>
+  <a href="https://t.me/s_smirnov_work" target="_blank">
+      <img src="https://github.com/FakaFakaYeah/FakaFakaYeah/blob/main/files/images/telegram.png" title="Telegram" alt="Telegram" width="40" height="40"/>&nbsp
+  </a>
+</div>
