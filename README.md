@@ -4,10 +4,7 @@
 
 ![img.png](/data/img.png)
 
-<details>
-  <summary>
-    <b> Оглавление</b>
-  </summary>
+<b> Оглавление</b>
     <ol>
      <li><a href="#description">Описание проекта</a></li>
      <li><a href="#auth">Данные для авторизации в админ-зоне и на сайте</a></li>
@@ -19,7 +16,6 @@
      <li><a href="#workflow">Workflow</a></li>
      <li><a href="#author">Авторы проекта</a></li>
     </ol>
-</details>
 
 
 ---
