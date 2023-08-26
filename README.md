@@ -10,7 +10,7 @@
  <li><a href="#architecture">Архитектура проекта</a></li>
  <li><a href="#docker">Как запустить проект в Docker?</a></li>
  <li><a href="#start_project">Как развернуть API локально?</a></li>
- <li><a href="#load_data">Заполнение базы начальными ингредиентами</a></li>
+ <li><a href="#load_data">Заполнение базы начальными данными</a></li>
  <li><a href="#workflow">Workflow</a></li>
  <li><a href="#author">Авторы проекта</a></li>
 </ol>
