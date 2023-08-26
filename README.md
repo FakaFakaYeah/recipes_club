@@ -1,6 +1,5 @@
 # **Клуб любителей рецептов**
 
-![](https://github.com/FakaFakaYeah/recipes_club/actions/workflows/foodgram_main.yml/badge.svg) 
 
 ![img.png](/data/img.png)
 
