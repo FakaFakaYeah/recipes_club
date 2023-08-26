@@ -6,11 +6,10 @@
 ### Оглавление
 <ol>
  <li><a href="#description">Описание проекта</a></li>
- <li><a href="#auth">Данные для авторизации в админ-зоне и на сайте</a></li>
  <li><a href="#stack">Используемые технологии</a></li>
  <li><a href="#architecture">Архитектура проекта</a></li>
- <li><a href="#start_project">Как развернуть проект локально?</a></li>
- <li><a href="#superuser">Создание суперпользователя</a></li>
+ <li><a href="#docker">Как запустить проект в Docker?</a></li>
+ <li><a href="#start_project">Как развернуть API локально?</a></li>
  <li><a href="#load_data">Заполнение базы начальными ингредиентами</a></li>
  <li><a href="#workflow">Workflow</a></li>
  <li><a href="#author">Авторы проекта</a></li>
@@ -23,21 +22,6 @@
 авторов. Есть возможность добавлять рецепты в избранные и свой список продуктов,
 который можно скачать сводных списком
 
-Проект доступен по адресам:
-
-```
-http://recipesgram.ddns.net/recipes/
-
-http://81.163.31.244/recipes/ 
-``` 
-
----
-### Данные для авторизации в админ-зоне и на сайте:<a name="auth"></a>
-
-```
-email: test@test.ru
-пароль: 1029384756
-```
 ---
 ### **Используемые технологии**<a name="stack"></a>
 ![](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
@@ -59,10 +43,10 @@ email: test@test.ru
 | `frontend`    | Код приложения на React                                  |
 
 ---
-### Как развернуть проект локально?<a name="start_project"></a>
+### Как запустить проект в Docker?<a name="docker"></a>
 * Запустите терминал и клонируйте репозиторий 
     ```
-    git clone https://github.com/FakaFakaYeah/foodgram-project-react/
+    git clone https://github.com/FakaFakaYeah/recipes_club.git
     ```
 
 * Установите Docker по ссылке https://www.docker.com/products/docker-desktop
@@ -76,12 +60,14 @@ email: test@test.ru
 
   Шаблон наполнения env файла
     ```
-    DB_ENGINE=django.db.backends.postgresql   указываем, что работаем с postgresql
-    DB_NAME=   имя базы данных
-    POSTGRES_USER=   логин для подключения к базе данных
-    POSTGRES_PASSWORD=   пароль для подключения к БД (установите свой)
-    DB_HOST=db   название сервиса (контейнера)
-    DB_PORT=  порт для подключения к БД
+  USE_POSTGRESQL=True  # Если флаг стоит False, будет использована sqlite3
+  SECRET_KEY=1235dfd
+  DB_ENGINE=django.db.backends.postgresql # указываем, что работаем с postgresql
+  DB_NAME=postgres # имя базы данных
+  POSTGRES_USER=postgres # логин для подключения к базе данных
+  POSTGRES_PASSWORD=postgres # пароль для подключения к БД (установите свой)
+  DB_HOST=db # название сервиса (контейнера)
+  DB_PORT=5432 # порт для подключения к БД
     ```
 
 * Выполните команду по разворачиванию docker-compose
@@ -95,26 +81,97 @@ email: test@test.ru
     ```
     docker-compose exec backend python manage.py migrate
     ```
+  
+* Выполните сбор статики проекта по следующей команде:
+    ```
+    docker-compose exec web python manage.py collectstatic --no-input
+    ```
+
+* Cоздайте суперпользователя
+  ```
+  docker-compose exec web python manage.py createsuperuser
+  ```
+  укажите имя пользователя, почту и пароль
+
+* Проект будет доступен по следующим адресам:
+  ```
+  http://localhost/recipes/ - главная страница сайта
+  http://localhost/admin/ - админ зона
+  ```
+  
+___
+### Как развернуть API локально?<a name="start_project"></a>
+
+* Запустите терминал и клонируйте репозиторий 
+    ```
+    git clone https://github.com/FakaFakaYeah/recipes_club.git
+    ```
+* Создайте и активируйте виртуальное окружение
+
+  Если у вас Linux/macOS
+
+  ```
+  python3 -m venv venv
+  source venv/bin/activate
+  ```
+  
+  Если у вас windows
+
+  ```
+  python -m venv venv
+  source venv/scripts/activate
+  ```
+  
+* Установите зависимости из файла requirements.txt:
+
+  ```
+  pip install -r requirements.txt
+  ```
+
+* Перейдите в директорию с файлами проекта
+  ```
+  cd backend
+  ```
+
+* Выполните миграции по следующей команде:
+  ```
+  python manage.py migrate
+  ```
+
+* Создайте суперпользователя
+  ```
+  python manage.py createsuperuser
+  ```
+  укажите имя пользователя, почту и пароль
+  
+* Запустите проект
+  ```
+  python manage.py runserver
+  ```
+  
+* API будет доступно по следующим адресам:
+  ```
+  http://127.0.0.1:8000/redoc/ - документация со всеми эндпоинтами
+  http://127.0.0.1:8000/admin/ - админ зона
+  ```
+
+* API запросы можно протестировать через приложение Postman, которое можно скачать по ссылке: https://www.postman.com/downloads/
+
 ---
+### Заполнение базы начальными данными<a name="load_data"></a>
 
-### Создание суперпользователя<a name="superuser"></a>
-По следующей команде вы можете создать суперпользователя, если вам нужен доступ в админ зону
-```
-docker-compose exec backend python manage.py createsuperuser
-```
-Потребуется ввести имя пользователя, почту и пароль
 
----
-### Заполнение базы начальными ингредиентами<a name="load_data"></a>
+Для заполнения базы этими данными выполните следующие команды в терминале:
 
-Ингредиенты хранятся в файле ingredients.json.
-Для заполнения базы этими данными выполните следующую команду менеджера из директории с manage.py:
-```
-docker-compose exec backend python manage.py load_ingredients
-```
-После этого загрузятся начальные данные
-
-API запросы можно протестировать через приложение Postman, которое можно скачать по ссылке: https://www.postman.com/downloads/
+* Если проект развернут в Docker
+    ```
+    docker-compose exec web python manage.py load_ingredients
+    ```
+* Если проект развернут локально
+    ```
+    cd backend
+    python manage.py load_ingredients
+    ```
 
 ---
 ### Workflow<a name="workflow"></a>
