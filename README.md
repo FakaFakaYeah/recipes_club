@@ -60,14 +60,14 @@
 
   Шаблон наполнения env файла
     ```
-  USE_POSTGRESQL=True  # Если флаг стоит False, будет использована sqlite3
-  SECRET_KEY=1235dfd
-  DB_ENGINE=django.db.backends.postgresql # указываем, что работаем с postgresql
-  DB_NAME=postgres # имя базы данных
-  POSTGRES_USER=postgres # логин для подключения к базе данных
-  POSTGRES_PASSWORD=postgres # пароль для подключения к БД (установите свой)
-  DB_HOST=db # название сервиса (контейнера)
-  DB_PORT=5432 # порт для подключения к БД
+  USE_POSTGRESQL=True  # Установите True, чтобы в докере использовалась PostgreSQL
+  SECRET_KEY=   #укажите свой SECRET_KEY
+  DB_ENGINE=django.db.backends.postgresql  #указываем, что работаем с postgresql
+  DB_NAME=    #имя базы данных
+  POSTGRES_USER=  #логин для подключения к базе данных
+  POSTGRES_PASSWORD=   #пароль для подключения к БД (установите свой)
+  DB_HOST=    #название сервиса (контейнера)
+  DB_PORT=    #порт для подключения к БД
     ```
 
 * Выполните команду по разворачиванию docker-compose
